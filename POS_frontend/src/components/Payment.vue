@@ -17,28 +17,29 @@
         </div>
 
         <div class="item2">
-          <reactive-base app="good-books-yj" credentials="gBgUqs2tV:3456f3bf-ea9e-4ebc-9c93-08eb13e5c87c">
+          <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
             <div class="item5">
-              <single-list componentId="Authors" dataField="authors.raw" class="filter" title="Select category" selectAllLabel="All breads" :showSearch="false" :showCount="false" />
+              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="Select category" selectAllLabel="All breads" :showSearch="false" :showCount="false" />
             </div>
 
-            <reactive-list componentId="SearchResult" dataField="original_title.raw" className="item6" :pagination="true" :from="0" :size="5" :react="{and: ['Authors']}">
+            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
-                    <md-button v-on:click='get_name(item.original_title)'>{{ item.original_title }}</md-button>
+                    <md-button v-on:click='get_name(item.pName, item.pPrice)'>{{ item.pName }}</md-button>
+                    <span><font style="color:gray;">{{item.pPrice}}</font></span>
 
                     <div class="buttons-inline" style="display:inline;">
-                      <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="delete_product(item.original_title)">X</md-button>
-                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="edit_clicked(item.original_title)">Edit</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="delete_product(item.pName, item.pPrice)">X</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="edit_clicked(item.pName)">Edit</md-button>
                     </div>
 
 
-                    <form v-if="(get_now_name() == item.original_title) && is_clicked" class="form-inline">
+                    <form v-if="(get_now_name() == item.pName) && is_clicked" class="form-inline">
                       <div class="form-group mx-sm-3 mb-2">
                         <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount">
                       </div>
-                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="change_amount(item.original_title)">OK</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="change_amount(item.pName, item.pPrice)">OK</md-button>
                     </form>
 
                   </div>
@@ -47,7 +48,14 @@
             </reactive-list>
           </reactive-base>
         </div>
-        <div class="item3"><h6 id="theme">Total price</h6></div>
+
+
+        <div class="item3">
+          <h6 id="theme">Total price</h6>
+          <div class="price_result">{{this.tot_price}}</div>
+        </div>
+
+
         <div class="item4">
           <h6 id="theme">Pay or not</h6>
           <md-button class="md-primary md-raised" v-on:click="pay()">Pay</md-button>
@@ -79,6 +87,7 @@ export default {
       now_product_name: '',
       is_clicked: false,
       active:false,
+      tot_price: 0,
     }
   },
   methods: {
@@ -86,13 +95,15 @@ export default {
       this.$router.replace('/home')
     },
 
-    get_name(name) {
+    get_name(name, price) {
       this.product_name = name
+
       if (this.product_list.includes(name)) {
         alert("This is already added")
       } else {
         this.product_list.push(name)
         this.product_amount.push(1)
+        this.tot_price += parseInt(price)
       }
 
       var html = '<table>';
@@ -110,14 +121,19 @@ export default {
     reset() {
       this.product_list = []
       this.product_amount = []
+      this.tot_price = 0
       document.getElementById("lists").innerHTML = this.product_list
     },
 
-    delete_product(name) {
+    delete_product(name, price) {
       var a = this.product_list.indexOf(name);
       if (a != -1) {
+        var temp = (this.product_amount[a])*parseInt(price);
+
+
         this.product_list.splice(a, 1);
         this.product_amount.splice(a, 1);
+        this.tot_price -= temp;
 
         var html = '<table>';
         for (var i = 0; i < this.product_list.length; i++) {
@@ -132,11 +148,20 @@ export default {
       }
     },
 
-    change_amount(name) {
+    change_amount(name, price) {
 
       var a = this.product_list.indexOf(name);
       if (a != -1) {
         if (this.user_amount > 0) {
+
+          if(this.user_amount > this.product_amount[a]){
+            // add (input-original)
+            this.tot_price += (this.user_amount - this.product_amount[a])*parseInt(price);
+          }else if(this.user_amount < this.product_amount[a]){
+            // gap
+            this.tot_price -= (this.product_amount[a] - this.user_amount)*parseInt(price);
+          }
+
           this.product_amount[a] = this.user_amount;
           this.user_amount = null;
 
@@ -220,7 +245,7 @@ export default {
 
 .item1 {
   grid-area: product_list;
-  width: 300px;
+
   overflow-y: scroll;
 }
 
@@ -273,6 +298,12 @@ export default {
 
 #input_amount {
   width: 60px;
+}
+
+.price_result{
+  color: red;
+  font-weight: bold;
+  font-size: 30px;
 }
 
 </style>
