@@ -6,8 +6,31 @@
 
   <div class="container">
     <div class="text-field">
-      <h5>Advance order list</h5>
+      <h5 id="theme">Advance order list</h5>
+
+      <div>
+        <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
+          <div class="filters-container">
+            <single-list componentId="Category" dataField="pCategory.keyword" title="Categories" />
+          </div>
+
+          <ReactiveList
+          componentId="SearchResult"
+          dataField="pName"
+          className="result-list-container"
+          :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+            <div slot="renderData" slot-scope="{ item }" class="border-review">
+              {{item.pName}}
+            </div>
+          </ReactiveList>
+
+        </reactive-base>
+      </div>
+
+
     </div>
+
+
 
   </div>
 </div>
@@ -22,7 +45,7 @@ export default {
   },
   methods: {
     goto_home() {
-      this.$router.replace('/')
+      this.$router.replace('/home')
     }
 
   }
@@ -32,6 +55,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 @import 'bootstrap.css';
+@import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
+
+#theme {
+  font-family: 'Arbutus Slab', serif;
+}
 
 .container {
   padding-left: 0px;
@@ -41,12 +69,16 @@ export default {
   width: auto;
 }
 
-#nav_home{
+#nav_home {
   color: white;
 }
 
-.text-field{
+.text-field {
   margin-top: 40px;
   margin-left: 40px;
+}
+
+.inline-1 {
+  display: inline;
 }
 </style>
