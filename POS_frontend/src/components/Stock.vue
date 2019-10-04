@@ -9,26 +9,26 @@
       <h5 id="theme">Stock management system</h5>
 
       <div id="app">
-        <reactive-base app="good-books-yj" credentials="gBgUqs2tV:3456f3bf-ea9e-4ebc-9c93-08eb13e5c87c">
+        <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
           <div class="filters-container">
-            <multi-list componentId="Authors" dataField="authors.raw" class="filter" title="Select category" selectAllLabel="All breads" />
+            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="Select category" selectAllLabel="All breads" />
           </div>
-          <reactive-list componentId="SearchResult" dataField="original_title.raw" className="result-list-container" :pagination="true" :from="0" :size="5" :react="{and: ['Authors']}">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <span style="font-weight: bold;">{{ item.original_title }}</span>
+                    <span style="font-weight: bold;">{{ item.pName }}</span>
                     <span style="margin-left:20px;">amount:</span>
                   </div>
 
                   <div class="form-group" style="margin-bottom:0px; margin-top:10px;">
                     <div class="input-group mb-3">
-                      <md-button class="md-icon-button md-raised md-dense md-primary" @click="edit_clicked(item.original_title)">Edit</md-button>
-                      <div v-if="(get_now_name() == item.original_title) && is_clicked">
+                      <md-button class="md-icon-button md-raised md-dense md-primary" @click="edit_clicked(item.pName)">Edit</md-button>
+                      <div v-if="(get_now_name() == item.pName) && is_clicked">
                         <div class="input-group-append" style="margin-left:20px;">
                           <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.original_title)" style="margin-left:5px;">Save</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName)" style="margin-left:5px;">Save</md-button>
                         </div>
                       </div>
                     </div>
@@ -56,16 +56,13 @@ export default {
   name: 'Stock',
   data() {
     return {
-      showBooks: window.innerWidth <= 768 ? true : false,
       now_product_name: '',
       is_clicked: false,
       user_amount: null,
     };
   },
   methods: {
-    switchContainer: function() {
-      return (this.showBooks = !this.showBooks);
-    },
+
     goto_home() {
       this.$router.replace('/home')
     },
