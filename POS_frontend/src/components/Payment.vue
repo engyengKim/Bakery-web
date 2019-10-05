@@ -27,7 +27,9 @@
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
                     <md-button v-on:click='get_name(item.pName, item.pPrice)'>{{ item.pName }}</md-button>
-                    <span><font style="color:gray;">{{item.pPrice}}</font></span>
+                    <span>
+                      <font style="color:gray;">{{item.pPrice}}</font>
+                    </span>
 
                     <div class="buttons-inline" style="display:inline;">
                       <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="delete_product(item.pName, item.pPrice)">X</md-button>
@@ -58,7 +60,41 @@
 
         <div class="item4">
           <h6 id="theme">Pay or not</h6>
-          <md-button class="md-primary md-raised" v-on:click="pay()">Pay</md-button>
+
+          <span>
+            <md-dialog :md-active.sync="showDialog">
+              <md-dialog-title>Payment System</md-dialog-title>
+
+              <md-tabs md-dynamic-height>
+                <md-tab md-label="Cash">
+                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
+                  <input type="user_money" v-model="user_money" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="got_money()">OK</md-button>
+                  <p v-if="remain" style="color:red; font-weight:bold; font-size:20px;">Change: {{this.remain}}</p>
+                </md-tab>
+
+                <md-tab md-label="Credit">
+                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
+                  <input type="card_number" v-model="card_number" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="check_creidt()">OK</md-button>
+                </md-tab>
+
+                <md-tab md-label="Gift card">
+                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
+                  <input type="card_number" v-model="card_number" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="check_gift()">OK</md-button>
+                </md-tab>
+              </md-tabs>
+
+              <md-dialog-actions>
+                <md-button class="md-primary" @click="close_pay()">Close</md-button>
+                <md-button class="md-primary" @click="pay()">Pay confirm</md-button>
+              </md-dialog-actions>
+            </md-dialog>
+
+            <md-button class="md-primary md-raised" @click="showDialog = true">PAY</md-button>
+          </span>
+
 
           <md-dialog-confirm :md-active.sync="active" md-title="Cancel payment?" md-content="If you confirm, all the product list will be initialized" md-confirm-text="Agree" md-cancel-text="Disagree" @md-cancel="onCancel" @md-confirm="onConfirm" />
           <md-button class="md-primary md-raised" @click="active = true">CANCEL</md-button>
@@ -86,8 +122,13 @@ export default {
       user_amount: null,
       now_product_name: '',
       is_clicked: false,
-      active:false,
+      active: false,
+      showDialog: false,
       tot_price: 0,
+      user_money: null,
+      remain: null,
+      card_number: null,
+      ok_pressed: false,
     }
   },
   methods: {
@@ -128,7 +169,7 @@ export default {
     delete_product(name, price) {
       var a = this.product_list.indexOf(name);
       if (a != -1) {
-        var temp = (this.product_amount[a])*parseInt(price);
+        var temp = (this.product_amount[a]) * parseInt(price);
 
 
         this.product_list.splice(a, 1);
@@ -154,12 +195,12 @@ export default {
       if (a != -1) {
         if (this.user_amount > 0) {
 
-          if(this.user_amount > this.product_amount[a]){
+          if (this.user_amount > this.product_amount[a]) {
             // add (input-original)
-            this.tot_price += (this.user_amount - this.product_amount[a])*parseInt(price);
-          }else if(this.user_amount < this.product_amount[a]){
+            this.tot_price += (this.user_amount - this.product_amount[a]) * parseInt(price);
+          } else if (this.user_amount < this.product_amount[a]) {
             // gap
-            this.tot_price -= (this.product_amount[a] - this.user_amount)*parseInt(price);
+            this.tot_price -= (this.product_amount[a] - this.user_amount) * parseInt(price);
           }
 
           this.product_amount[a] = this.user_amount;
@@ -186,14 +227,20 @@ export default {
     },
 
     pay() {
+      if(this.ok_pressed){
+        this.remain = null;
+        this.showDialog = false;
+        alert("PAY Successively Done!");
+      }else{
+        alert("ERR: Not permitted!");
+      }
 
     },
 
     onConfirm() {
       window.history.go(0);
     },
-    onCancel() {
-    },
+    onCancel() {},
 
     edit_clicked(name) {
       var a = this.product_list.indexOf(name);
@@ -209,6 +256,36 @@ export default {
 
     get_now_name() {
       return (this.now_product_name);
+    },
+
+    got_money(){
+      this.remain = null;
+      if(this.user_money){
+        if(this.user_money < this.tot_price){
+          alert("ERR: Money not enough!");
+        }else{
+          // big or same Money --> remain!
+          this.remain = this.user_money - this.tot_price;
+          this.ok_pressed = true;
+        }
+      }else{
+        alert("ERR: Got NO MONEY!");
+      }
+    },
+
+    check_creidt(){
+
+    },
+
+    check_gift(){
+
+    },
+
+    close_pay(){
+      this.remain = null;
+      this.user_money = null;
+      this.card_number = null;
+      this.showDialog = false;
     },
 
   }
@@ -300,7 +377,7 @@ export default {
   width: 60px;
 }
 
-.price_result{
+.price_result {
   color: red;
   font-weight: bold;
   font-size: 30px;
