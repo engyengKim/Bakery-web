@@ -19,7 +19,7 @@
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
-                    <span style="margin-left:20px;">amount:</span>
+                    <span style="margin-left:20px;">amount: {{ item.pAmount }}</span>
                   </div>
 
                   <div class="form-group" style="margin-bottom:0px; margin-top:10px;">
@@ -28,7 +28,7 @@
                       <div v-if="(get_now_name() == item.pName) && is_clicked">
                         <div class="input-group-append" style="margin-left:20px;">
                           <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName)" style="margin-left:5px;">Save</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">Save</md-button>
                         </div>
                       </div>
                     </div>
@@ -51,6 +51,9 @@
 <script>
 import "./style.css";
 import 'vue-material/dist/vue-material.min.css'
+import axios from 'axios'
+const baseurl = 'https://scalr.api.appbase.io'
+
 
 export default {
   name: 'Stock',
@@ -67,28 +70,49 @@ export default {
       this.$router.replace('/home')
     },
 
-    save_db(name) {
+    save_db(name, product_id) {
       // pass [name, amount] to server
 
       // first, check amount is valid
       if (this.user_amount > 0) {
+        // axios POST
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+            headers: {
+              Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              'doc': {
+                'pAmount': this.user_amount,
+              }
+            }
+        })
+      .then((response) => {
+        //var hits_length = response.data.hits.hits.length
+        console.log(response);
         alert("Success");
         this.is_clicked = false;
-      } else {
-        alert("Type positive integer!");
-      }
-    },
+      }).catch((e) => {
+        console.log(e.response)
+      })
 
-    edit_clicked(name) {
-      this.now_product_name = name;
-      this.is_clicked = true;
-    },
+    } else {
+      alert("Type positive integer!");
+    }
+  },
 
-    get_now_name() {
-      return (this.now_product_name);
-    },
+  edit_clicked(name) {
+    this.now_product_name = name;
+    this.is_clicked = true;
+  },
 
-  }
+  get_now_name() {
+    return (this.now_product_name);
+  },
+
+}
 }
 </script>
 
