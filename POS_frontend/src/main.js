@@ -10,6 +10,7 @@ import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
+import VueSession from 'vue-session'
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
@@ -18,6 +19,7 @@ Vue.use(VueAxios, axios)
 Vue.use(ReactiveSearch)
 Vue.use(VueMaterial)
 Vue.use(MdContent)
+Vue.use(VueSession)
 
 /* eslint-disable no-new */
 new Vue({
