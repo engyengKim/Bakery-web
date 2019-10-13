@@ -54,7 +54,7 @@ export default {
 
 .outer{
   background: url("../assets/bread_background.jpg");
-  height: 600px;
+  height: 100%;
   background-repeat: no-repeat;
   background-size:cover;
 }

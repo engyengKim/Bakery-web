@@ -42,12 +42,14 @@ export default {
 @import 'bootstrap.css';
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noticia+Text&display=swap');
 
+
 .outer{
   background: url("../assets/bread_background.jpg");
-  height: 600px;
+  height: 100%;
   background-repeat: no-repeat;
   background-size:cover;
 }
+
 
 .crack {
   margin-bottom: 10px;
