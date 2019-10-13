@@ -4,7 +4,6 @@ import Home from '@/components/Home'
 import Order from '@/components/Order'
 import Payment from '@/components/Payment'
 import Stock from '@/components/Stock'
-import Trash from '@/components/Trash'
 import Start from '@/components/Start'
 import Login from '@/components/Login'
 
@@ -41,11 +40,6 @@ export default new Router({
       path: '/stock',
       name: 'Stock',
       component: Stock
-    },
-    {
-      path: '/trash',
-      name: 'Trash',
-      component: Trash
     },
 
   ]

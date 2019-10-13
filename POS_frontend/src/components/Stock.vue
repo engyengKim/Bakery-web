@@ -94,6 +94,7 @@ export default {
         console.log(response);
         alert("Success");
         this.is_clicked = false;
+        window.history.go(0);
       }).catch((e) => {
         console.log(e.response)
       })

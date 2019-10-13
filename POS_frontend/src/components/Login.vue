@@ -80,7 +80,7 @@ export default {
                     console.log("CONFIRM!")
                     console.log("Current User ID is :"+currentUserId)
                     alert('Welcome! '+currentUserName)
-                    this.$router.push('/')
+                    this.$router.push('/home')
                 }
                 else{
                     currentUserId = ''
