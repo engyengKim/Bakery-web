@@ -6,17 +6,18 @@
          <div class="page-header">
            <h1 id="theme">POS Web</h1><br><br>
              <p id="description" class="lead"><font color="black">
-               <h3>Hi, store manager</h3>
-               We will provide you with the best service so that<br>
-               you can run the store well again today.<br><br>
-               POS web has 3 main systems.<br>
+               <h3>안녕하세요, 매장 관리자님</h3>
+               저희는 매장 관리자의 운영/판매 작업을 위하여<br>
+               다음 4가지의 시스템을 제공하고 있습니다<br><br>
+               당신의 완벽한 비지니스 파트너가 되도록 노력하겠습니다<br>
              </font>
             </p>
 
              <div>
-               <button type="button" class="btn btn-warning" v-on:click="goto_stock()">Stock management</button><div class="crack"></div>
-               <button type="button" class="btn btn-warning" v-on:click="goto_payment()">Payment system</button><div class="crack"></div>
-               <button type="button" class="btn btn-warning" v-on:click="goto_order()">Advance order management</button>
+               <button type="button" class="btn btn-warning" v-on:click="goto_stock()">재고 관리 시스템</button><div class="crack"></div>
+               <button type="button" class="btn btn-warning" v-on:click="goto_payment()">결제 시스템</button><div class="crack"></div>
+               <button type="button" class="btn btn-warning" v-on:click="goto_order()">예약 관리 시스템</button><div class="crack"></div>
+               <button type="button" class="btn btn-warning" v-on:click="goto_revenue()">매출 관리 시스템</button>
              </div>
          </div>
        </div>
@@ -43,6 +44,9 @@ export default {
     goto_payment() {
       this.$router.replace('/payment')
     },
+    goto_revenue() {
+      this.$router.replace('/revenue')
+    }
   }
 }
 </script>
@@ -51,6 +55,7 @@ export default {
 <style scoped>
 @import 'bootstrap.css';
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noticia+Text&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
 .outer{
   background: url("../assets/bread_background.jpg");
@@ -78,7 +83,7 @@ export default {
 }
 
 #description{
-  font-family: 'Noticia Text', serif;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 

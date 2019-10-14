@@ -7,13 +7,13 @@
           <h1 id="theme">POS Web</h1><br><br>
           <p id="description" class="lead">
             <font color="black">
-              <h3>Hi, store manager</h3><br>
-              <h6>You have to login</h6>
+              <h3>안녕하세요, 매장 관리자님</h3><br>
+              <h6>로그인을 해주십시오</h6>
             </font>
           </p>
 
           <div>
-            <button type="button" class="btn btn-warning" v-on:click="goto_login()">Login</button>
+            <button type="button" class="btn btn-warning" v-on:click="goto_login()">로그인</button>
           </div>
         </div>
       </div>
@@ -41,6 +41,7 @@ export default {
 <style scoped>
 @import 'bootstrap.css';
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy|Noticia+Text&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
 
 .outer{
@@ -72,7 +73,7 @@ export default {
 
 
 #description{
-  font-family: 'Noticia Text', serif;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 

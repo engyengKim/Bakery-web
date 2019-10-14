@@ -9,8 +9,8 @@
 
       <div class="grid-container">
         <div class="item1">
-          <h6 id="theme">Product list</h6>
-          <md-button class="md-raised md-accent" v-on:click="reset()">Reset</md-button>
+          <h6 id="theme">결제할 품목</h6>
+          <md-button class="md-raised md-accent" v-on:click="reset()">초기화</md-button>
           <div id="lists"></div>
 
 
@@ -19,7 +19,7 @@
         <div class="item2">
           <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
             <div class="item5">
-              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="Select category" selectAllLabel="All breads" :showSearch="false" :showCount="false" />
+              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하시오" selectAllLabel="모든 제품" :showSearch="false" :showCount="false" />
             </div>
 
             <reactive-list componentId="SearchResult" dataField="pName" className="item6" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
@@ -33,7 +33,7 @@
 
                     <div class="buttons-inline" style="display:inline;">
                       <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="delete_product(item.pName, item.pPrice)">X</md-button>
-                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="edit_clicked(item.pName)">Edit</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="edit_clicked(item.pName)">수정</md-button>
                     </div>
 
 
@@ -41,7 +41,7 @@
                       <div class="form-group mx-sm-3 mb-2">
                         <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount">
                       </div>
-                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="change_amount(item.pName, item.pPrice)">OK</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="change_amount(item.pName, item.pPrice)">확인</md-button>
                     </form>
 
                   </div>
@@ -53,51 +53,58 @@
 
 
         <div class="item3">
-          <h6 id="theme">Total price</h6>
+          <h6 id="theme">총 금액</h6>
           <div class="price_result">{{this.tot_price}}</div>
         </div>
 
 
         <div class="item4">
-          <h6 id="theme">Pay or not</h6>
+          <h6 id="theme">거래 진행 및 취소</h6>
 
           <span>
             <md-dialog :md-active.sync="showDialog">
-              <md-dialog-title>Payment System</md-dialog-title>
+              <md-dialog-title>결제 창</md-dialog-title>
 
               <md-tabs md-dynamic-height>
-                <md-tab md-label="Cash">
-                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
+                <md-tab md-label="현금으로 결제">
+                  <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
+                  <span>받은 돈</span>
                   <input type="user_money" v-model="user_money" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="got_money()">OK</md-button>
-                  <p v-if="remain" style="color:red; font-weight:bold; font-size:20px;">Change: {{this.remain}}</p>
+                  <span>사용자 바코드</span>
+                  <input type="user_barcode" v-model="user_barcode" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="got_money()">확인</md-button>
+                  <p v-if="remain" style="color:red; font-weight:bold; font-size:20px;">잔돈: {{this.remain}}</p>
                 </md-tab>
 
-                <md-tab md-label="Credit">
-                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
-                  <input type="card_number" v-model="card_number" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="check_creidt()">OK</md-button>
+                <md-tab md-label="사용자 바코드로 결제">
+                  <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
+                  <span>사용자 바코드</span>
+                  <input type="user_barcode" v-model="user_barcode" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="check_creidt()">확인</md-button>
                 </md-tab>
 
-                <md-tab md-label="Gift card">
-                  <div style="font-weight:bold;">Price: {{this.tot_price}}</div>
-                  <input type="card_number" v-model="card_number" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="check_gift()">OK</md-button>
+                <md-tab md-label="상품권으로 결제">
+                  <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
+                  <span>상품권 번호</span>
+                  <input type="gift_number" v-model="gift_number" class="form-control">
+                  <span>사용자 바코드</span>
+                  <input type="user_barcode" v-model="user_barcode" class="form-control">
+                  <md-button class="md-accent md-dense md-raised" @click="check_gift()">확인</md-button>
                 </md-tab>
               </md-tabs>
 
               <md-dialog-actions>
-                <md-button class="md-primary" @click="close_pay()">Close</md-button>
-                <md-button class="md-primary" @click="pay()">Pay confirm</md-button>
+                <md-button class="md-primary" @click="close_pay()">닫기</md-button>
+                <md-button class="md-primary" @click="pay()">결제 진행</md-button>
               </md-dialog-actions>
             </md-dialog>
 
-            <md-button class="md-primary md-raised" @click="showDialog = true">PAY</md-button>
+            <md-button class="md-primary md-raised" @click="showDialog = true">결제</md-button>
           </span>
 
 
-          <md-dialog-confirm :md-active.sync="active" md-title="Cancel payment?" md-content="If you confirm, all the product list will be initialized" md-confirm-text="Agree" md-cancel-text="Disagree" @md-cancel="onCancel" @md-confirm="onConfirm" />
-          <md-button class="md-primary md-raised" @click="active = true">CANCEL</md-button>
+          <md-dialog-confirm :md-active.sync="active" md-title="결제를 취소하시겠습니까?" md-content="확인을 누르시면, 결제 창이 초기화됩니다" md-confirm-text="확인" md-cancel-text="취소" @md-cancel="onCancel" @md-confirm="onConfirm" />
+          <md-button class="md-primary md-raised" @click="active = true">취소</md-button>
         </div>
       </div>
 
@@ -127,8 +134,9 @@ export default {
       tot_price: 0,
       user_money: null,
       remain: null,
-      card_number: null,
+      user_barcode: null,
       ok_pressed: false,
+      gift_number: null,
     }
   },
   methods: {
@@ -140,7 +148,7 @@ export default {
       this.product_name = name
 
       if (this.product_list.includes(name)) {
-        alert("This is already added")
+        alert("이미 품목에 추가되었습니다")
       } else {
         this.product_list.push(name)
         this.product_amount.push(1)
@@ -219,10 +227,10 @@ export default {
 
           this.is_clicked = false;
         } else {
-          alert("Type number!");
+          alert("숫자를 입력하세요!");
         }
       } else {
-        alert("Select the menu first!");
+        alert("메뉴를 먼저 선택하세요!");
       }
     },
 
@@ -230,9 +238,9 @@ export default {
       if(this.ok_pressed){
         this.remain = null;
         this.showDialog = false;
-        alert("PAY Successively Done!");
+        alert("결제가 성공적으로 진행되었습니다");
       }else{
-        alert("ERR: Not permitted!");
+        alert("에러: 승인 거부");
       }
 
     },
@@ -249,7 +257,7 @@ export default {
         this.now_product_name = name;
         this.is_clicked = true;
       } else {
-        alert("Select the menu first!");
+        alert("메뉴를 먼저 선택하세요!");
       }
 
     },
@@ -262,14 +270,14 @@ export default {
       this.remain = null;
       if(this.user_money){
         if(this.user_money < this.tot_price){
-          alert("ERR: Money not enough!");
+          alert("에러: 현금이 모자랍니다!");
         }else{
           // big or same Money --> remain!
           this.remain = this.user_money - this.tot_price;
           this.ok_pressed = true;
         }
       }else{
-        alert("ERR: Got NO MONEY!");
+        alert("에러: 받은 현금이 없습니다!");
       }
     },
 
@@ -298,10 +306,7 @@ export default {
 @import 'vue-material/dist/vue-material.min.css';
 @import 'vue-material/dist/theme/default.css';
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
-
-#theme {
-  font-family: 'Arbutus Slab', serif;
-}
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
 .container {
   padding-left: 0px;
@@ -309,6 +314,7 @@ export default {
   margin-left: 0px;
   margin-right: 0px;
   width: auto;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 #nav_home {

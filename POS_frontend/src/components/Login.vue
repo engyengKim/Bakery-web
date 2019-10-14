@@ -9,22 +9,22 @@
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12" style="height: 402px;">
                         <form id="login-form" class="form" @submit.prevent="loginFunction">
-                            <h3 class="text-center text-info">Login</h3>
+                            <h3 class="text-center text-info">로그인</h3>
                             <div class="form-group">
-                                <label for="uEmail" class="text-info">Email:</label><br>
+                                <label for="uEmail" class="text-info">이메일:</label><br>
                                 <input type="email" name="uEmail" id="uEmail" v-model="uEmail" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="uPassword" class="text-info">Password:</label><br>
+                                <label for="uPassword" class="text-info">비밀번호:</label><br>
                                 <input type="password" name="uPassword" id="uPassword" v-model="uPassword" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <button class="btn btn-success">Login</button>
+                                <button class="btn btn-success">로그인</button>
                                 <div id="register-link" class="text-right">
-                                    <p>You don't have Bakery-web manager account?</p>
-                                    <a href="#" class="text-info">Register Information</a><div style="margin-bottom: 10px;" />
-                                    <md-button class="md-accent" v-on:click="gotoHome()">previous page</md-button>
+                                    <p>Bakery-web 매니저 계정이 없으신가요?</p>
+                                    <a href="#" class="text-info">등록 정보</a><div style="margin-bottom: 10px;" />
+                                    <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
                                 </div>
                             </div>
 
@@ -79,14 +79,14 @@ export default {
                     this.$session.set('uId', currentUserId)
                     console.log("CONFIRM!")
                     console.log("Current User ID is :"+currentUserId)
-                    alert('Welcome! '+currentUserName)
+                    alert('어서오세요! '+currentUserName+'님')
                     this.$router.push('/home')
                 }
                 else{
                     currentUserId = ''
                     console.log("NOT CONFIRM")
                     console.log("Current User ID is :"+currentUserId)
-                    alert('Login Failed ! \n Please check your email and password')
+                    alert('로그인 실패! \n 이메일과 비밀번호를 확인하세요')
                 }
                 console.log(currentUserId)
 
@@ -104,10 +104,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 @import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css");
 @import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js");
 @import url("https://code.jquery.com/jquery-1.11.1.min.js");
+
 .crack{
   margin-bottom: 10px;
 }
@@ -143,6 +144,10 @@ body {
 }
 #login .container #login-row #login-column #login-box #login-form {
   padding: 20px;
+}
+
+#login-container{
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 </style>

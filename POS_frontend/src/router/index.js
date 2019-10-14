@@ -6,6 +6,7 @@ import Payment from '@/components/Payment'
 import Stock from '@/components/Stock'
 import Start from '@/components/Start'
 import Login from '@/components/Login'
+import Revenue from '@/components/Revenue'
 
 Vue.use(Router)
 
@@ -40,6 +41,11 @@ export default new Router({
       path: '/stock',
       name: 'Stock',
       component: Stock
+    },
+    {
+      path: '/revenue',
+      name: 'Revenue',
+      component: Revenue
     },
 
   ]

@@ -6,12 +6,12 @@
 
   <div class="container">
     <div class="text-field">
-      <h5 id="theme">Stock management system</h5>
+      <h5 id="theme">재고 관리 시스템</h5>
 
       <div id="app">
         <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
           <div class="filters-container">
-            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="Select category" selectAllLabel="All breads" />
+            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품" />
           </div>
           <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
             <div slot="renderData" slot-scope="{ item }">
@@ -19,16 +19,16 @@
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
-                    <span style="margin-left:20px;">amount: {{ item.pAmount }}</span>
+                    <span style="margin-left:20px;">수량: {{ item.pAmount }}</span>
                   </div>
 
                   <div class="form-group" style="margin-bottom:0px; margin-top:10px;">
                     <div class="input-group mb-3">
-                      <md-button class="md-icon-button md-raised md-dense md-primary" @click="edit_clicked(item.pName)">Edit</md-button>
+                      <md-button class="md-icon-button md-raised md-dense md-primary" @click="edit_clicked(item.pName)">수정</md-button>
                       <div v-if="(get_now_name() == item.pName) && is_clicked">
                         <div class="input-group-append" style="margin-left:20px;">
                           <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">Save</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">저장</md-button>
                         </div>
                       </div>
                     </div>
@@ -53,6 +53,7 @@ import "./style.css";
 import 'vue-material/dist/vue-material.min.css'
 import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
+
 
 
 export default {
@@ -92,7 +93,7 @@ export default {
       .then((response) => {
         //var hits_length = response.data.hits.hits.length
         console.log(response);
-        alert("Success");
+        alert("변경되었습니다");
         this.is_clicked = false;
         window.history.go(0);
       }).catch((e) => {
@@ -100,7 +101,7 @@ export default {
       })
 
     } else {
-      alert("Type positive integer!");
+      alert("자연수를 입력하세요!");
     }
   },
 
@@ -121,6 +122,7 @@ export default {
 <style scoped>
 @import 'bootstrap.css';
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
 .container {
   padding-left: 0px;
@@ -170,7 +172,7 @@ export default {
   display: inline-block;
 }
 
-#theme {
-  font-family: 'Arbutus Slab', serif;
+.container {
+  font-family: 'Noto Sans KR', sans-serif;
 }
 </style>
