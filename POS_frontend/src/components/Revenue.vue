@@ -6,17 +6,9 @@
 
   <div class="container">
     <div class="text-field">
-      <h5 id="theme">Advance order list</h5>
+      <h5>매출 관리 시스템</h5>
       <div>
-        <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
 
-          <reactive-list componentId="SearchResult" dataField="pName" :pagination="true" :from="0" :size="5">
-            <div slot="renderData" slot-scope="{ item }" class="order-list">
-                  {{item.pName}}
-            </div>
-          </reactive-list>
-
-        </reactive-base>
       </div>
 
     </div>
@@ -74,5 +66,4 @@ export default {
 .order-list {
   padding-top: 15px;
 }
-
 </style>
