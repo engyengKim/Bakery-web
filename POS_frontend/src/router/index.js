@@ -7,6 +7,10 @@ import Stock from '@/components/Stock'
 import Start from '@/components/Start'
 import Login from '@/components/Login'
 import Revenue from '@/components/Revenue'
+import Inventory from '@/components/Inventory'
+import Expire from '@/components/Expire'
+import History from '@/components/History'
+import MyPage from '@/components/MyPage'
 
 Vue.use(Router)
 
@@ -46,6 +50,26 @@ export default new Router({
       path: '/revenue',
       name: 'Revenue',
       component: Revenue
+    },
+    {
+      path: '/inventory',
+      name: 'Inventory',
+      component: Inventory
+    },
+    {
+      path: '/history',
+      name: 'History',
+      component: History
+    },
+    {
+      path: '/expire',
+      name: 'Expire',
+      component: Expire
+    },
+    {
+      path: '/my_page',
+      name: 'MyPage',
+      component: MyPage
     },
 
   ]
