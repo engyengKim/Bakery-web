@@ -19,7 +19,7 @@
         <div class="item2">
           <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
             <div class="item5">
-              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하시오" selectAllLabel="모든 제품" :showSearch="false" :showCount="false" />
+              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false" :showCount="false" />
             </div>
 
             <reactive-list componentId="SearchResult" dataField="pName" className="item6" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
@@ -66,36 +66,26 @@
               <md-dialog-title>결제 창</md-dialog-title>
 
               <md-tabs md-dynamic-height>
-                <md-tab md-label="현금으로 결제">
+                <md-tab md-label="현금">
                   <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
                   <span>받은 돈</span>
                   <input type="user_money" v-model="user_money" class="form-control">
-                  <span>사용자 바코드</span>
-                  <input type="user_barcode" v-model="user_barcode" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="got_money()">확인</md-button>
+                  <md-button class="md-accent md-dense md-raised" @click="got_money()">현금 받음</md-button>
                   <p v-if="remain" style="color:red; font-weight:bold; font-size:20px;">잔돈: {{this.remain}}</p>
                 </md-tab>
 
-                <md-tab md-label="사용자 바코드로 결제">
+                <md-tab md-label="베이커리 코인">
                   <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
                   <span>사용자 바코드</span>
                   <input type="user_barcode" v-model="user_barcode" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="check_creidt()">확인</md-button>
+                  <md-button class="md-accent md-dense md-raised" @click="check_creidt()">결제</md-button>
                 </md-tab>
 
-                <md-tab md-label="상품권으로 결제">
-                  <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
-                  <span>상품권 번호</span>
-                  <input type="gift_number" v-model="gift_number" class="form-control">
-                  <span>사용자 바코드</span>
-                  <input type="user_barcode" v-model="user_barcode" class="form-control">
-                  <md-button class="md-accent md-dense md-raised" @click="check_gift()">확인</md-button>
-                </md-tab>
               </md-tabs>
 
               <md-dialog-actions>
                 <md-button class="md-primary" @click="close_pay()">닫기</md-button>
-                <md-button class="md-primary" @click="pay()">결제 진행</md-button>
+                <md-button class="md-primary" @click="pay()">완료</md-button>
               </md-dialog-actions>
             </md-dialog>
 
@@ -137,6 +127,7 @@ export default {
       user_barcode: null,
       ok_pressed: false,
       gift_number: null,
+      is_remain: false,
     }
   },
   methods: {
@@ -270,7 +261,9 @@ export default {
       this.remain = null;
       if(this.user_money){
         if(this.user_money < this.tot_price){
-          alert("에러: 현금이 모자랍니다!");
+          alert("잔금 "+(this.tot_price - this.user_money)+"원은 베이커리 코인으로 결제하세요.");
+          this.tot_price = this.tot_price - this.user_money;
+          this.is_remain = true;
         }else{
           // big or same Money --> remain!
           this.remain = this.user_money - this.tot_price;
@@ -282,10 +275,7 @@ export default {
     },
 
     check_creidt(){
-
-    },
-
-    check_gift(){
+      // bakery coin
 
     },
 
@@ -367,7 +357,8 @@ export default {
   transition: all ease 0.2s;
   overflow: hidden;
   display: inline-grid;
-  width: 35%;
+  padding: 0px;
+  margin: 0px;
 }
 
 .item6 {
@@ -376,7 +367,6 @@ export default {
   scroll-behavior: smooth;
   transition: all ease 0.2s;
   display: inline-grid;
-  width: 60%;
 }
 
 #input_amount {
@@ -387,6 +377,12 @@ export default {
   color: red;
   font-weight: bold;
   font-size: 30px;
+}
+
+.filter.css-m1gst5{
+  width: 120px;
+  padding: 0px;
+  margin-right:5px;
 }
 
 </style>

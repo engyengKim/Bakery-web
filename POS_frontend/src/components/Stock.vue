@@ -12,6 +12,26 @@
         <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
           <div class="filters-container">
             <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품" />
+            <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
+
+            <div style="margin-left:auto; margin-right:auto;">
+              <md-dialog :md-active.sync="showDialog">
+                <md-dialog-title>메뉴 추가하기</md-dialog-title>
+
+                <md-tabs md-dynamic-height>
+                  <md-tab>
+                  </md-tab>
+                </md-tabs>
+
+                <md-dialog-actions>
+                  <md-button class="md-primary" @click="showDialog = false">취소</md-button>
+                  <md-button class="md-accent" @click="confirm_add_menu()">추가</md-button>
+                </md-dialog-actions>
+              </md-dialog>
+
+              <md-button class="md-primary" @click="showDialog = true">메뉴 추가</md-button>
+            </div>
+
           </div>
           <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
             <div slot="renderData" slot-scope="{ item }">
@@ -19,18 +39,38 @@
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
-                    <span style="margin-left:20px;">수량: {{ item.pAmount }}</span>
+
+                    <div class="product_info">
+                      <span>수량: {{ item.pAmount }}</span>
+                      <span>유통기한: </span>
+                      <span>가격: </span>
+                    </div>
+
                   </div>
 
                   <div class="form-group" style="margin-bottom:0px; margin-top:10px;">
                     <div class="input-group mb-3">
-                      <md-button class="md-icon-button md-raised md-dense md-primary" @click="edit_clicked(item.pName)">수정</md-button>
-                      <div v-if="(get_now_name() == item.pName) && is_clicked">
+                      <md-button class="md-button md-raised md-dense md-primary" style="margin-right:10px;" @click="edit_clicked_1(item.pName)">수량 변경</md-button>
+                      <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 1)">
                         <div class="input-group-append" style="margin-left:20px;">
                           <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">저장</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px; margin-right:5px;">저장</md-button>
                         </div>
                       </div>
+
+                      <md-button class="md-button md-raised md-dense md-accent" @click="edit_clicked_2(item.pName)" style="margin-right:10px;">가격 변경</md-button>
+                      <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 2)">
+                        <div class="input-group-append" style="margin-left:20px;">
+                          <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
+                          <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">저장</md-button>
+                        </div>
+                      </div>
+
+                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?"
+                        md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소"
+                        @md-confirm="delete_menu(get_now_name())" />
+                      <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)">메뉴 삭제</md-button>
+
                     </div>
                   </div>
 
@@ -63,6 +103,9 @@ export default {
       now_product_name: '',
       is_clicked: false,
       user_amount: null,
+      what_change: 0,
+      active: false,
+      showDialog: false,
     };
   },
   methods: {
@@ -89,38 +132,92 @@ export default {
                 'pAmount': this.user_amount,
               }
             }
+          })
+          .then((response) => {
+            //var hits_length = response.data.hits.hits.length
+            console.log(response);
+            alert("변경되었습니다");
+            this.is_clicked = false;
+            window.history.go(0);
+          }).catch((e) => {
+            console.log(e.response)
+          })
+
+      } else {
+        alert("자연수를 입력하세요!");
+      }
+    },
+
+    edit_clicked_1(name) {
+      this.now_product_name = name;
+      this.is_clicked = true;
+      this.what_change = 1;
+    },
+
+    edit_clicked_2(name) {
+      this.now_product_name = name;
+      this.is_clicked = true;
+      this.what_change = 2;
+    },
+
+    get_now_name() {
+      return (this.now_product_name);
+    },
+
+    get_what_change() {
+      return (this.what_change);
+    },
+
+    goto_Inventory() {
+      this.$router.replace('/inventory')
+    },
+
+    delete_menu(product_name) {
+      // axios POST
+      axios({
+          method: 'POST',
+          url: baseurl + '/bakery_product/_delete_by_query',
+          headers: {
+            Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "query": {
+              "match": {
+                "pName": product_name
+              }
+            }
+          }
         })
-      .then((response) => {
-        //var hits_length = response.data.hits.hits.length
-        console.log(response);
-        alert("변경되었습니다");
-        this.is_clicked = false;
-        window.history.go(0);
-      }).catch((e) => {
-        console.log(e.response)
-      })
+        .then((response) => {
+          //var hits_length = response.data.hits.hits.length
+          console.log(response);
+          alert("삭제되었습니다");
+          this.is_clicked = false;
+          window.history.go(0);
+        }).catch((e) => {
+          console.log(e.response)
+        })
+    },
 
-    } else {
-      alert("자연수를 입력하세요!");
-    }
-  },
+    delete_clicked(name){
+      this.active = true;
+      this.now_product_name = name;
+    },
 
-  edit_clicked(name) {
-    this.now_product_name = name;
-    this.is_clicked = true;
-  },
+    add_menu(){
 
-  get_now_name() {
-    return (this.now_product_name);
-  },
+    },
 
-}
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 @import 'bootstrap.css';
+@import 'vue-material/dist/vue-material.min.css';
+@import 'vue-material/dist/theme/default.css';
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
 
@@ -174,5 +271,9 @@ export default {
 
 .container {
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+.product_info {
+  margin-top: 2px;
 }
 </style>
