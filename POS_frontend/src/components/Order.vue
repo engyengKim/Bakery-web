@@ -10,7 +10,7 @@
       <div>
         <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
 
-          <reactive-list componentId="SearchResult" dataField="pName" :pagination="true" :from="0" :size="5">
+          <reactive-list componentId="SearchResult" dataField="pName" :showResultStats="false" :pagination="true" :from="0" :size="5">
             <div slot="renderData" slot-scope="{ item }" class="order-list">
                   {{item.pName}}
             </div>

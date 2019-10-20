@@ -22,7 +22,7 @@
               <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false" :showCount="false" />
             </div>
 
-            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
