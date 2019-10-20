@@ -27,6 +27,8 @@
             <button type="button" class="btn btn-warning" v-on:click="goto_revenue()">매출 관리 시스템</button>
           </div>
 
+          <md-button class="md-accent" v-on:click="logout()" style="font-weight:bold; margin-top:5px;">로그아웃</md-button>
+
 
         </div>
       </div>
@@ -57,7 +59,12 @@ export default {
     },
     goto_mypage(){
       this.$router.replace('/my_page')
-    }
+    },
+    logout(){
+      this.$session.destroy();
+      alert("로그아웃 되셨습니다.");
+      this.$router.replace('/');
+    },
   }
 }
 </script>

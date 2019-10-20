@@ -19,31 +19,50 @@
                 <md-dialog-title>메뉴 추가하기</md-dialog-title>
 
                 <md-tabs md-dynamic-height>
-                  <md-tab>
+                  <md-tab md-label="새 메뉴 정보">
+                    <div class="form-group">
+                      <div class="input-group mb-3">
+                        <span style="font-weight: bold;">이름</span>
+                        <input type="new_pName" v-model="new_pName" class="form-control" placeholder="이름"><div style="margin-bottom: 5px;"/>
+                        <span style="font-weight: bold;">수량</span>
+                        <input type="new_pAmount" v-model="new_pAmount" class="form-control" placeholder="수량">
+                        <span style="font-weight: bold;">가격</span>
+                        <input type="new_pPrice" v-model="new_pPrice" class="form-control" placeholder="가격">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="input-group mb-3">
+                        <span style="font-weight: bold;">카테고리</span>
+                        <input type="new_pCategory" v-model="new_pCategory" class="form-control" placeholder="카테고리">
+                        <span style="font-weight: bold;">유통기한 년/월/일</span>
+                        <input type="date" v-model="new_pExpire" class="form-control">
+                      </div>
+                    </div>
                   </md-tab>
                 </md-tabs>
 
                 <md-dialog-actions>
                   <md-button class="md-primary" @click="showDialog = false">취소</md-button>
-                  <md-button class="md-accent" @click="confirm_add_menu()">추가</md-button>
+                  <md-button class="md-accent" @click="add_menu()">추가</md-button>
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-primary" @click="showDialog = true">메뉴 추가</md-button>
+              <md-button class="md-primary" @click="showDialog = true" style="font-weight:bold;">메뉴 추가</md-button>
             </div>
 
           </div>
-          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
             <div slot="renderData" slot-scope="{ item }">
-              <div class="flex book-content" key="item._id">
+              <div class="flex book-content" key="item.pName">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
 
                     <div class="product_info">
-                      <span>수량: {{ item.pAmount }}</span>
-                      <span>유통기한: </span>
-                      <span>가격: </span>
+                      <span style="color: #425DC6; font-weight:bold;">[수량]</span> {{ item.pAmount }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[유통기한]</span> {{ item.pExpireDate }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
                     </div>
 
                   </div>
@@ -69,7 +88,7 @@
                       <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?"
                         md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소"
                         @md-confirm="delete_menu(get_now_name())" />
-                      <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)">메뉴 삭제</md-button>
+                      <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)" style="font-weight: bold;">메뉴 삭제</md-button>
 
                     </div>
                   </div>
@@ -106,6 +125,12 @@ export default {
       what_change: 0,
       active: false,
       showDialog: false,
+
+      new_pName: '',
+      new_pAmount: null,
+      new_pPrice: null,
+      new_pExpire: null,
+      new_pCategory: null,
     };
   },
   methods: {
@@ -118,8 +143,8 @@ export default {
       // pass [name, amount] to server
 
       // first, check amount is valid
-      if (this.user_amount > 0) {
-        // axios POST
+      if (this.user_amount >= 0 && this.what_change == 1) {
+        // change AMOUNT
         axios({
             method: 'POST',
             url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
@@ -136,15 +161,39 @@ export default {
           .then((response) => {
             //var hits_length = response.data.hits.hits.length
             console.log(response);
-            alert("변경되었습니다");
+            alert("[수량] 변경되었습니다");
             this.is_clicked = false;
             window.history.go(0);
           }).catch((e) => {
             console.log(e.response)
           })
 
-      } else {
-        alert("자연수를 입력하세요!");
+      } else if(this.user_amount >= 0 && this.what_change == 2) {
+        // change PRICE
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+            headers: {
+              Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              'doc': {
+                'pPrice': this.user_amount,
+              }
+            }
+          })
+          .then((response) => {
+            //var hits_length = response.data.hits.hits.length
+            console.log(response);
+            alert("[가격] 변경되었습니다");
+            this.is_clicked = false;
+            window.history.go(0);
+          }).catch((e) => {
+            console.log(e.response)
+          })
+      } else if(this.user_amount < 0){
+        alert("음수를 입력할 수 없습니다!");
       }
     },
 
@@ -206,6 +255,31 @@ export default {
     },
 
     add_menu(){
+      // post
+      axios({
+          method: 'POST',
+          url: baseurl + '/bakery_product/_doc/',
+          headers: {
+            Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "pName": this.new_pName,
+            "pAmount": this.new_pAmount,
+            "pPrice": this.new_pPrice,
+            "pCategory": this.new_pCategory,
+            "pExpireDate": this.new_pExpire,
+          }
+        })
+        .then((response) => {
+          //var hits_length = response.data.hits.hits.length
+          console.log(response);
+          alert("추가되었습니다");
+          this.showDialog = false;
+          window.history.go(0);
+        }).catch((e) => {
+          console.log(e.response)
+        })
 
     },
 
