@@ -11,6 +11,10 @@ import Inventory from '@/components/Inventory'
 import Expire from '@/components/Expire'
 import History from '@/components/History'
 import MyPage from '@/components/MyPage'
+import Admin_Home from '@/components/Admin_Home'
+import Admin_myPage from '@/components/Admin_myPage'
+import Admin_manage from '@/components/Admin_manage'
+
 
 Vue.use(Router)
 
@@ -70,6 +74,21 @@ export default new Router({
       path: '/my_page',
       name: 'MyPage',
       component: MyPage
+    },
+    {
+      path: '/admin_home',
+      name: 'Admin_Home',
+      component: Admin_Home
+    },
+    {
+      path: '/admin_mypage',
+      name: 'Admin_myPage',
+      component: Admin_myPage
+    },
+    {
+      path: '/admin_manage',
+      name: 'Admin_manage',
+      component: Admin_manage
     },
 
   ]

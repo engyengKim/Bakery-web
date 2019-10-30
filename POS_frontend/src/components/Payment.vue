@@ -26,7 +26,7 @@
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
-                    <md-button v-on:click='get_name(item.pName, item.pPrice)'>{{ item.pName }}</md-button>
+                    <md-button v-on:click='get_name(item.pName, item.pPrice, item._id, item.pAmount)'>{{ item.pName }}</md-button>
                     <span>
                       <font style="color:gray;">{{item.pPrice}}</font>
                     </span>
@@ -93,7 +93,7 @@
           </span>
 
 
-          <md-dialog-confirm :md-active.sync="active" md-title="결제를 취소하시겠습니까?" md-content="확인을 누르시면, 결제 창이 초기화됩니다" md-confirm-text="확인" md-cancel-text="취소" @md-cancel="onCancel" @md-confirm="onConfirm" />
+          <md-dialog-confirm :md-active.sync="active" md-title="결제를 취소하시겠습니까?" md-content="확인을 누르시면, 결제 창이 초기화됩니다" md-confirm-text="확인" md-cancel-text="취소" @md-cancel="onCancel" @md-confirm="close_pay" />
           <md-button class="md-primary md-raised" @click="active = true">취소</md-button>
         </div>
       </div>
@@ -108,6 +108,9 @@
 
 
 <script>
+import axios from 'axios'
+const baseurl = 'https://scalr.api.appbase.io'
+
 export default {
   name: 'Payment',
   data() {
@@ -116,6 +119,9 @@ export default {
       product_list: [],
       product_amount: [],
       product_price: [],
+      product_id: [],
+      product_original_amount: [],
+
       user_amount: null,
       now_product_name: '',
       is_clicked: false,
@@ -128,14 +134,50 @@ export default {
       ok_pressed: false,
       gift_number: null,
       is_remain: false,
+      is_partial_pay: false,
+
+      buying_date: null,
+      buying_store: null,
+      buying_manager: null,
     }
+  },
+  created() {
+    this.uid = this.$session.get('uId');
+
+    // axios POST
+    axios({
+        method: 'POST',
+        url: baseurl + '/bakery_users/_mget',
+        headers: {
+          Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "docs": [{
+            "_id": this.uid,
+          }, ]
+        }
+      })
+      .then((response) => {
+        console.log(response);
+
+        this.buying_manager = response.data.docs[0]._source.uName;
+        this.buying_store = response.data.docs[0]._source.uAddress;
+      }).catch((e) => {
+        console.log(e.response)
+      })
+
+    var currentDate = new Date();
+    var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+    this.buying_date = currentDateWithFormat;
+
   },
   methods: {
     goto_home() {
       this.$router.replace('/home')
     },
 
-    get_name(name, price) {
+    get_name(name, price, id, amount) {
       this.product_name = name
 
       if (this.product_list.includes(name)) {
@@ -143,6 +185,9 @@ export default {
       } else {
         this.product_list.push(name)
         this.product_amount.push(1)
+        this.product_id.push(id)
+        this.product_original_amount.push(amount)
+
         this.tot_price += parseInt(price)
       }
 
@@ -161,6 +206,9 @@ export default {
     reset() {
       this.product_list = []
       this.product_amount = []
+      this.product_id = []
+      this.product_original_amount = []
+
       this.tot_price = 0
       document.getElementById("lists").innerHTML = this.product_list
     },
@@ -173,6 +221,9 @@ export default {
 
         this.product_list.splice(a, 1);
         this.product_amount.splice(a, 1);
+        this.product_id.splice(a, 1);
+        this.product_original_amount.splice(a, 1);
+
         this.tot_price -= temp;
 
         var html = '<table>';
@@ -226,19 +277,89 @@ export default {
     },
 
     pay() {
-      if(this.ok_pressed){
+      // check amount is valid
+      var amount_is_okay = true;
+
+      for(var i=0; i<this.product_list.length; i++){
+        var product_id = this.product_id[i];
+        var original_amount = this.product_original_amount[i];
+        var new_amount = original_amount - this.product_amount[i];
+
+        if(new_amount < 0){
+          // amount is not enough
+          alert("수량이 부족합니다. ["+this.product_list[i]+"]");
+          amount_is_okay = false;
+          break;
+        }
+      }
+
+      if (this.ok_pressed && amount_is_okay) {
         this.remain = null;
         this.showDialog = false;
+
+
+        if (this.is_partial_pay) {
+          //when CASH & Bakery conin
+
+        }else {
+          //axios POST
+          axios({
+              method: 'POST',
+              url: baseurl + '/bakery_record/_doc',
+              headers: {
+                Authorization: 'Basic VGh6MlgydWFVOjMyMmMwYjA3LTI1MmQtNDRlNS1iZDU3LWZhYzE0ODZjNzMwMg==',
+                'Content-Type': 'application/json'
+              },
+              data: {
+                "rStore": this.buying_store,
+                "rSeller": this.buying_manager,
+                "rDate": this.buying_date,
+              }
+            })
+            .then((response) => {
+              console.log(response);
+              alert("DB write success :)");
+            }).catch((e) => {
+              console.log(e.response)
+            })
+        }
+
+        // change amount of products
+        // this.product_list, this.product_amount
+        for(var i=0; i<this.product_list.length; i++){
+          var product_id = this.product_id[i];
+          var original_amount = this.product_original_amount[i];
+          var new_amount = original_amount - this.product_amount[i];
+
+          // axios POST
+          axios({
+              method: 'POST',
+              url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+              headers: {
+                Authorization: 'Basic SlhSQ09mclFnOjdiMWM1NmQ4LWZhNmEtNDlmNS1iZTIxLTEzNWJiY2VkZmExMA==',
+                'Content-Type': 'application/json'
+              },
+              data: {
+                "doc": {
+                  "pAmount": new_amount
+                }
+              }
+            })
+            .then((response) => {
+              console.log(response);
+            }).catch((e) => {
+              console.log(e.response)
+            })
+        }
+
+
         alert("결제가 성공적으로 진행되었습니다");
-      }else{
+      } else {
         alert("에러: 승인 거부");
       }
 
     },
 
-    onConfirm() {
-      window.history.go(0);
-    },
     onCancel() {},
 
     edit_clicked(name) {
@@ -257,33 +378,44 @@ export default {
       return (this.now_product_name);
     },
 
-    got_money(){
+    got_money() {
+      // when using CASH
       this.remain = null;
-      if(this.user_money){
-        if(this.user_money < this.tot_price){
-          alert("잔금 "+(this.tot_price - this.user_money)+"원은 베이커리 코인으로 결제하세요.");
+      if (this.user_money) {
+        if (this.user_money < this.tot_price) {
+          alert("잔금 " + (this.tot_price - this.user_money) + "원은 베이커리 코인으로 결제하세요.");
           this.tot_price = this.tot_price - this.user_money;
           this.is_remain = true;
-        }else{
+          this.is_partial_pay = true;
+        } else {
           // big or same Money --> remain!
           this.remain = this.user_money - this.tot_price;
           this.ok_pressed = true;
         }
-      }else{
+      } else {
         alert("에러: 받은 현금이 없습니다!");
       }
     },
 
-    check_creidt(){
+    check_creidt() {
       // bakery coin
 
     },
 
-    close_pay(){
+    close_pay() {
       this.remain = null;
       this.user_money = null;
       this.card_number = null;
       this.showDialog = false;
+      this.tot_price = 0;
+
+      this.product_list = [];
+      this.product_amount = [];
+      this.product_price = [];
+      this.product_id = [];
+      this.product_original_amount = [];
+
+      document.getElementById("lists").innerHTML = this.product_list
     },
 
   }
@@ -379,10 +511,9 @@ export default {
   font-size: 30px;
 }
 
-.filter.css-m1gst5{
+.filter.css-m1gst5 {
   width: 120px;
   padding: 0px;
-  margin-right:5px;
+  margin-right: 5px;
 }
-
 </style>
