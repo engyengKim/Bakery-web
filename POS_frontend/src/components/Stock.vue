@@ -63,6 +63,7 @@
                       <span style="color: #425DC6; font-weight:bold;">[수량]</span> {{ item.pAmount }}
                       <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[유통기한]</span> {{ item.pExpireDate }}
                       <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[pTotal]</span> {{ item.pTotalAmount }}
                     </div>
 
                   </div>
@@ -131,6 +132,8 @@ export default {
       new_pPrice: null,
       new_pExpire: null,
       new_pCategory: null,
+
+      json_object: [],
     };
   },
   methods: {
@@ -149,7 +152,7 @@ export default {
             method: 'POST',
             url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
             headers: {
-              Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+              Authorization: 'Basic SlhSQ09mclFnOjdiMWM1NmQ4LWZhNmEtNDlmNS1iZTIxLTEzNWJiY2VkZmExMA==',
               'Content-Type': 'application/json'
             },
             data: {

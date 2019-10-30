@@ -1,7 +1,7 @@
 <template>
 <div class="container-start">
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a id="nav_home" class="navbar-brand" v-on:click="goto_home()">POS web</a>
+    <a id="nav_home" class="navbar-brand" v-on:click="goto_home()">Admin Page</a>
   </nav>
 
   <div class="container">
@@ -9,16 +9,16 @@
       <h5 id="theme">마이 페이지</h5>
 
       <div class="description">
-        <h6 style="margin-top: 40px; margin-bottom:15px;">[매니저 정보]</h6>
-        매니저 이름: {{ this.user_name }}
+        <h6 style="margin-top: 40px; margin-bottom:15px;">[관리자 정보]</h6>
+        관리자 이름: {{ this.admin_name }}
         <div class="crack" />
-        매니저 이메일: {{ this.user_email }}
+        관리자 이메일: {{ this.admin_email }}
         <div class="crack" />
-        매니저 비밀번호: {{ this.user_pwd }}
+        관리자 비밀번호: {{ this.admin_pwd }}
         <span>
           <span>
               <md-dialog :md-active.sync="showDialog">
-                <md-dialog-title>매니저 정보 변경</md-dialog-title>
+                <md-dialog-title>관리자 정보 변경</md-dialog-title>
 
                 <md-tabs md-dynamic-height>
                   <md-tab md-label="비밀번호 변경">
@@ -33,69 +33,9 @@
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-dense md-accent md-raised" @click="showDialog = true" style="margin-left:10px;">비밀번호 변경</md-button>
+              <md-button class="md-dense md-accent md-raised" @click="showDialog = true" style="margin-left: 20px;">비밀번호 변경</md-button>
             </span>
-
-        </span><br>
-        매니저 계좌번호:
-        <div class="crack" />
-
-        <h6 style="margin-top: 30px; margin-bottom:10px;">[가게 정보]</h6>
-        <div class="caution" style="color:gray; font-size:15px; margin-bottom:15px;">
-          [가게 이름 변경]과 [주소 변경]의 경우, 반드시 사전에 Admin의 승인을
-          받으셔야 합니다.
-        </div>
-        가게 이름:
-        <span>
-
-          <span>
-              <md-dialog :md-active.sync="showDialog_1">
-                <md-dialog-title>가게 정보 변경</md-dialog-title>
-
-                <md-tabs md-dynamic-height>
-                  <md-tab md-label="가게 이름 변경">
-                    <input type="store_name" v-model="store_name" class="form-control" placeholder="가게 이름">
-                  </md-tab>
-                </md-tabs>
-
-                <md-dialog-actions>
-                  <md-button class="md-primary" @click="showDialog_1 = false">취소</md-button>
-                  <md-button class="md-primary" @click="change_store_name()">변경</md-button>
-                </md-dialog-actions>
-              </md-dialog>
-
-              <md-button class="md-dense md-accent md-raised" @click="showDialog_1 = true" style="margin-left:10px;">이름 변경</md-button>
-            </span>
-
         </span>
-        <div class="crack" />
-        가게 주소: {{ this.user_addr }}
-        <span>
-
-          <span>
-              <md-dialog :md-active.sync="showDialog_2">
-                <md-dialog-title>가게 정보 변경</md-dialog-title>
-
-                <md-tabs md-dynamic-height>
-                  <md-tab md-label="가게 주소 변경">
-                    <input type="store_location" v-model="store_location" class="form-control" placeholder="가게 주소">
-                  </md-tab>
-                </md-tabs>
-
-                <md-dialog-actions>
-                  <md-button class="md-primary" @click="showDialog_2 = false">취소</md-button>
-                  <md-button class="md-primary" @click="change_store_location()">변경</md-button>
-                </md-dialog-actions>
-              </md-dialog>
-
-              <md-button class="md-dense md-accent md-raised" @click="showDialog_2 = true" style="margin-left:10px;">주소 변경</md-button>
-            </span>
-
-
-        </span>
-        <div class="crack" />
-
-
 
       </div>
 
@@ -120,21 +60,15 @@ export default {
   data() {
     return {
       showDialog: false,
-      showDialog_1: false,
-      showDialog_2: false,
       pwd: null,
       pwd_trial: null,
-      uid: null,
-      store_name: null,
-      store_location: null,
 
-      user_name: '',
-      user_email: '',
-      user_addr: '',
-      user_pwd: '',
-
+      admin_name: null,
+      admin_email: null,
+      admin_pwd: null,
     };
   },
+
   created() {
     this.uid = this.$session.get('uId');
 
@@ -157,21 +91,18 @@ export default {
       .then((response) => {
         console.log(response);
 
-        this.user_name = response.data.docs[0]._source.uName;
-        this.user_email = response.data.docs[0]._source.uEmail;
-        this.user_addr = response.data.docs[0]._source.uAddress;
-        this.user_pwd = response.data.docs[0]._source.uPassword;
+        this.admin_name = response.data.docs[0]._source.uName;
+        this.admin_email = response.data.docs[0]._source.uEmail;
+        this.admin_pwd = response.data.docs[0]._source.uPassword;
 
       }).catch((e) => {
         console.log(e.response)
       })
-
-
-
   },
+
   methods: {
     goto_home() {
-      this.$router.replace('/home')
+      this.$router.replace('/admin_home')
     },
 
     change_pwd() {
