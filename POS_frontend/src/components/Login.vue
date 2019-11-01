@@ -1,103 +1,103 @@
 <template>
+<div class="container" id="login-container">
 
-  <div class="container" id="login-container">
+  <div id="login">
+    <h3 class="text-center text-white pt-5">Welcome to Bakery POS Web!</h3>
+    <div class="container">
+      <div id="login-row" class="row justify-content-center align-items-center">
+        <div id="login-column" class="col-md-6">
+          <div id="login-box" class="col-md-12" style="height: 402px;">
+            <form id="login-form" class="form" @submit.prevent="loginFunction">
+              <h3 class="text-center text-info">로그인</h3>
+              <div class="form-group">
+                <label for="uEmail" class="text-info">이메일:</label><br>
+                <input type="email" name="uEmail" id="uEmail" v-model="uEmail" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="uPassword" class="text-info">비밀번호:</label><br>
+                <input type="password" name="uPassword" id="uPassword" v-model="uPassword" class="form-control">
+              </div>
 
-     <div id="login">
-        <h3 class="text-center text-white pt-5">Welcome to Bakery POS Web!</h3>
-        <div class="container">
-            <div id="login-row" class="row justify-content-center align-items-center">
-                <div id="login-column" class="col-md-6">
-                    <div id="login-box" class="col-md-12" style="height: 402px;">
-                        <form id="login-form" class="form" @submit.prevent="loginFunction">
-                            <h3 class="text-center text-info">로그인</h3>
-                            <div class="form-group">
-                                <label for="uEmail" class="text-info">이메일:</label><br>
-                                <input type="email" name="uEmail" id="uEmail" v-model="uEmail" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="uPassword" class="text-info">비밀번호:</label><br>
-                                <input type="password" name="uPassword" id="uPassword" v-model="uPassword" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <button class="btn btn-success">로그인</button>
-                                <div id="register-link" class="text-right">
-                                    <p>Bakery-web 매니저 계정이 없으신가요?</p>
-                                    <a href="#" class="text-info">등록 정보</a><div style="margin-bottom: 10px;" />
-                                    <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
+              <div class="form-group">
+                <button class="btn btn-success">로그인</button>
+                <div id="register-link" class="text-right">
+                  <p>Bakery-web 매니저 계정이 없으신가요?</p>
+                  <a href="#" class="text-info">등록 정보</a>
+                  <div style="margin-bottom: 10px;" />
+                  <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
                 </div>
-            </div>
-        </div>
-    </div>
+              </div>
 
-   </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 </template>
 
 <script>
 import axios from 'axios'
-const baseurl = 'https://scalr.api.appbase.io/bakery_users'
+const baseurl = 'https://scalr.api.appbase.io/bakery_manager'
 var currentUserId = ''
 
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
-        'uEmail':'',
-        'uPassword':''
+      'uEmail': '',
+      'uPassword': ''
     }
   },
-  methods:{
-      loginFunction: function(){
-          axios({
-                method: 'POST',
-                url: baseurl+'/_search',
-                headers: {
-                    Authorization: 'Basic bFVCcGFYYkFmOjc2ZjQ0OGUwLTAxMTMtNDkyZS04MWIzLTFhNzY0YWUzODkwMg==',
-                    'Content-Type': 'application/json'
-                },
-                data: {
-                    'query':{
-                        'bool':{
-                            'must':[
-                                {'match_phrase':{ 'uEmail':this.uEmail}},
-                                {'match_phrase':{ 'uPassword':this.uPassword}}
-                            ]
-                        }
-                    }
-                }
-            }).then((response) => {
-                console.log(response)
+  methods: {
+    loginFunction: function(){
+         axios({
+               method: 'POST',
+               url: baseurl+'/_search',
+               headers: {
+                   Authorization: 'Basic V1E3M0ZKMk1lOjkzZWJiNjNlLWE1MWMtNDJmNS04YjhlLTY5YzBjNjY0YjdkMw==',
+                   'Content-Type': 'application/json'
+               },
+               data: {
+                   'query':{
+                       'bool':{
+                           'must':[
+                               {'match_phrase':{ 'email':this.uEmail}},
+                               {'match_phrase':{ 'password':this.uPassword}}
+                           ]
+                       }
+                   }
+               }
+           }).then((response) => {
+               console.log(response)
 
-                if(response.data.hits.max_score != null){
-                    currentUserId = response.data.hits.hits[0]._id
-                    var currentUserName = response.data.hits.hits[0]._source.uName
-                    this.$session.set('uId', currentUserId)
-                    console.log("CONFIRM!")
-                    console.log("Current User ID is :"+currentUserId)
-                    alert('어서오세요! '+currentUserName+'님')
-                    this.$router.push('/home')
-                }
-                else{
-                    currentUserId = ''
-                    console.log("NOT CONFIRM")
-                    console.log("Current User ID is :"+currentUserId)
-                    alert('로그인 실패! \n 이메일과 비밀번호를 확인하세요')
-                }
-                console.log(currentUserId)
+               if(response.data.hits.max_score != null){
+                   currentUserId = response.data.hits.hits[0]._id
+                   var currentUserName = response.data.hits.hits[0]._source.name
+                   this.$session.set('uId', currentUserId)
+                   console.log("CONFIRM!")
+                   console.log("Current User ID is :"+currentUserId)
+                   alert('어서오세요! '+currentUserName+'님')
+                   this.$router.push('/home')
+               }
+               else{
+                   currentUserId = ''
+                   console.log("NOT CONFIRM")
+                   console.log("Current User ID is :"+currentUserId)
+                   alert('로그인 실패! \n 이메일과 비밀번호를 확인하세요')
+               }
+               console.log(currentUserId)
 
-            }).catch((ex)=>{
-                console.log(ex)
-            })
-      },
+           }).catch((ex)=>{
+               console.log(ex)
+           })
+     },
 
-      gotoHome() {
-        this.$router.replace('/')
-      },
+    gotoHome() {
+      this.$router.replace('/')
+    },
   }
 }
 </script>
@@ -109,24 +109,27 @@ export default {
 @import url("https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js");
 @import url("https://code.jquery.com/jquery-1.11.1.min.js");
 
-.crack{
+.crack {
   margin-bottom: 10px;
 }
-.page-header{
+
+.page-header {
   text-align: center;
 }
-#theme{
+
+#theme {
   padding-top: 60px;
 }
+
 body {
-    font-family: "Lato", sans-serif;
+  font-family: "Lato", sans-serif;
 }
 
 
 
-.main-head{
-    height: 150px;
-    background: #FFF;
+.main-head {
+  height: 150px;
+  background: #FFF;
 
 }
 
@@ -136,18 +139,19 @@ body {
   background-color: #17a2b8;
   height: 100vh;
 }
+
 #login .container #login-row #login-column #login-box {
   max-width: 600px;
   height: 320px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }
+
 #login .container #login-row #login-column #login-box #login-form {
   padding: 20px;
 }
 
-#login-container{
+#login-container {
   font-family: 'Noto Sans KR', sans-serif;
 }
-
 </style>

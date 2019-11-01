@@ -10,11 +10,11 @@
 
       <div class="description">
         <h6 style="margin-top: 40px; margin-bottom:15px;">[매니저 정보]</h6>
-        매니저 이름: {{ this.user_name }}
+        매니저 이름: <span class="user_info">{{ this.user_name }}</span>
         <div class="crack" />
-        매니저 이메일: {{ this.user_email }}
+        매니저 이메일: <span class="user_info">{{ this.user_email }}</span>
         <div class="crack" />
-        매니저 비밀번호: {{ this.user_pwd }}
+        매니저 비밀번호: <span class="user_info">{{ this.user_pwd }}</span>
         <span>
           <span>
               <md-dialog :md-active.sync="showDialog">
@@ -37,7 +37,7 @@
             </span>
 
         </span><br>
-        매니저 계좌번호:
+        매니저 계좌번호: <span class="user_info">{{ this.user_bankinfo }}</span>
         <div class="crack" />
 
         <h6 style="margin-top: 30px; margin-bottom:10px;">[가게 정보]</h6>
@@ -45,7 +45,7 @@
           [가게 이름 변경]과 [주소 변경]의 경우, 반드시 사전에 Admin의 승인을
           받으셔야 합니다.
         </div>
-        가게 이름:
+        가게 이름: <span class="user_info">{{ this.store_name }}</span>
         <span>
 
           <span>
@@ -69,7 +69,7 @@
 
         </span>
         <div class="crack" />
-        가게 주소: {{ this.user_addr }}
+        가게 주소: <span class="user_info">{{ this.user_addr }}</span>
         <span>
 
           <span>
@@ -132,6 +132,7 @@ export default {
       user_email: '',
       user_addr: '',
       user_pwd: '',
+      user_bankinfo: '',
 
     };
   },
@@ -141,9 +142,9 @@ export default {
     // axios POST
     axios({
         method: 'POST',
-        url: baseurl + '/bakery_users/_mget',
+        url: baseurl + '/bakery_manager/_mget',
         headers: {
-          Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+          Authorization: 'Basic V1E3M0ZKMk1lOjkzZWJiNjNlLWE1MWMtNDJmNS04YjhlLTY5YzBjNjY0YjdkMw==',
           'Content-Type': 'application/json'
         },
         data: {
@@ -157,10 +158,13 @@ export default {
       .then((response) => {
         console.log(response);
 
-        this.user_name = response.data.docs[0]._source.uName;
-        this.user_email = response.data.docs[0]._source.uEmail;
-        this.user_addr = response.data.docs[0]._source.uAddress;
-        this.user_pwd = response.data.docs[0]._source.uPassword;
+        this.user_name = response.data.docs[0]._source.name;
+        this.user_email = response.data.docs[0]._source.email;
+        this.user_addr = response.data.docs[0]._source.address;
+        this.user_pwd = response.data.docs[0]._source.password;
+        this.user_bankinfo = response.data.docs[0]._source.bankInfo;
+
+        this.store_name = response.data.docs[0]._source.storeName;
 
       }).catch((e) => {
         console.log(e.response)
@@ -180,14 +184,14 @@ export default {
         // axios POST
         axios({
             method: 'POST',
-            url: baseurl + '/bakery_users/_doc/' + this.uid + '/_update',
+            url: baseurl + '/bakery_manager/_doc/' + this.uid + '/_update',
             headers: {
-              Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+              Authorization: 'Basic eXVkeG5LSXFGOmM4NWFiNGE0LWQ0ZTktNDJjNC1iMDdkLTMzMTMwYTU1MzRhMw==',
               'Content-Type': 'application/json'
             },
             data: {
               'doc': {
-                'uPassword': this.pwd,
+                'password': this.pwd,
               }
             }
           })
@@ -254,5 +258,9 @@ export default {
 
 .crack {
   margin-bottom: 10px;
+}
+
+.user_info{
+  color: blue;
 }
 </style>
