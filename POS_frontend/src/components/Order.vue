@@ -6,7 +6,7 @@
 
   <div class="container">
     <div class="text-field">
-      <h5 id="theme">Advance order list</h5>
+      <h5 id="theme">예약 주문 목록</h5>
       <div>
         <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
 

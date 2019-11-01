@@ -9,7 +9,7 @@
       <h5 id="theme">재고 관리 시스템</h5>
 
       <div id="app">
-        <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
+        <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
           <div class="filters-container">
             <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품" />
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
@@ -23,11 +23,10 @@
                     <div class="form-group">
                       <div class="input-group mb-3">
                         <span style="font-weight: bold;">이름</span>
-                        <input type="new_pName" v-model="new_pName" class="form-control" placeholder="이름"><div style="margin-bottom: 5px;"/>
+                        <input type="new_pName" v-model="new_pName" class="form-control" placeholder="이름">
+                        <div style="margin-bottom: 5px;" />
                         <span style="font-weight: bold;">수량</span>
                         <input type="new_pAmount" v-model="new_pAmount" class="form-control" placeholder="수량">
-                        <span style="font-weight: bold;">가격</span>
-                        <input type="new_pPrice" v-model="new_pPrice" class="form-control" placeholder="가격">
                       </div>
                     </div>
 
@@ -35,10 +34,27 @@
                       <div class="input-group mb-3">
                         <span style="font-weight: bold;">카테고리</span>
                         <input type="new_pCategory" v-model="new_pCategory" class="form-control" placeholder="카테고리">
-                        <span style="font-weight: bold;">유통기한 년/월/일</span>
+                        <span style="font-weight: bold;">유통기한</span>
                         <input type="date" v-model="new_pExpire" class="form-control">
                       </div>
                     </div>
+
+                    <div class="form-group">
+                      <div class="input-group mb-3">
+                        <span style="font-weight: bold;">원가</span>
+                        <input type="new_pCost" v-model="new_pCost" class="form-control" placeholder="원가">
+                        <span style="font-weight: bold;">가격</span>
+                        <input type="new_pPrice" v-model="new_pPrice" class="form-control" placeholder="가격">
+                        <span style="font-weight: bold;">바코드</span>
+                        <input type="text" v-model="new_pBarcode" class="form-control" placeholder="바코드 번호">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <span style="font-weight: bold;">설명</span>
+                      <input type="text" v-model="new_pDescript" class="form-control" placeholder="설명">
+                    </div>
+
                   </md-tab>
                 </md-tabs>
 
@@ -60,11 +76,12 @@
                     <span style="font-weight: bold;">{{ item.pName }}</span>
 
                     <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold;">[수량]</span> {{ item.pAmount }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[유통기한]</span> {{ item.pExpireDate }}
                       <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[pTotal]</span> {{ item.pTotalAmount }}
                     </div>
+
+
+                    <md-button class="md-primary md-dense" style="font-weight:bold;" @click="show_pDetail(item._id, item.pName)">수량/유통기한 확인</md-button>
+                    <div id="detail_lists" v-if="(get_now_name() == item.pName)"></div>
 
                   </div>
 
@@ -72,23 +89,32 @@
                     <div class="input-group mb-3">
                       <md-button class="md-button md-raised md-dense md-primary" style="margin-right:10px;" @click="edit_clicked_1(item.pName)">수량 변경</md-button>
                       <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 1)">
-                        <div class="input-group-append" style="margin-left:20px;">
-                          <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
+                        <div class="input-group-append" style="margin-left:5px;">
+                          <input type="text" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px; margin-right: 5px;" placeholder="수량">
+                          <input type="date" v-model="user_date" class="form-control" id="input_amount">
                           <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px; margin-right:5px;">저장</md-button>
                         </div>
                       </div>
 
-                      <md-button class="md-button md-raised md-dense md-accent" @click="edit_clicked_2(item.pName)" style="margin-right:10px;">가격 변경</md-button>
+                      <md-button class="md-button md-raised md-dense md-primary" style="margin-right:10px; background-color:green;" @click="edit_clicked_3(item.pName)">물품 입고</md-button>
+                      <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 3)">
+                        <div class="input-group-append" style="margin-left:5px;">
+                          <input type="text" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px; margin-right: 5px;" placeholder="수량">
+                          <input type="date" v-model="user_date" class="form-control" id="input_amount">
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px; margin-right:5px; background-color:green;">저장</md-button>
+                        </div>
+                      </div>
+
+
+                      <md-button class="md-button md-raised md-dense md-accent" @click="edit_clicked_2(item.pName)">가격 변경</md-button>
                       <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 2)">
-                        <div class="input-group-append" style="margin-left:20px;">
-                          <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px;">
+                        <div class="input-group-append" style="margin-left:5px;">
+                          <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 100px;">
                           <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">저장</md-button>
                         </div>
                       </div>
 
-                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?"
-                        md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소"
-                        @md-confirm="delete_menu(get_now_name())" />
+                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?" md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소" @md-confirm="delete_menu(get_now_name())" />
                       <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)" style="font-weight: bold;">메뉴 삭제</md-button>
 
                     </div>
@@ -114,15 +140,17 @@ import 'vue-material/dist/vue-material.min.css'
 import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
 
-
-
 export default {
   name: 'Stock',
   data() {
     return {
       now_product_name: '',
       is_clicked: false,
+
       user_amount: null,
+      user_date: null,
+      user_detail: '',
+
       what_change: 0,
       active: false,
       showDialog: false,
@@ -132,8 +160,18 @@ export default {
       new_pPrice: null,
       new_pExpire: null,
       new_pCategory: null,
+      new_pBarcode: '',
+      new_pCost: null,
+      new_pDescript: '',
 
-      json_object: [],
+      temp_length: 0,
+      temp_arr_amount: [],
+      temp_arr_date: [],
+      temp_index: 0,
+      temp_string: null,
+
+      is_same: false,
+
     };
   },
   methods: {
@@ -145,39 +183,104 @@ export default {
     save_db(name, product_id) {
       // pass [name, amount] to server
 
-      // first, check amount is valid
-      if (this.user_amount >= 0 && this.what_change == 1) {
-        // change AMOUNT
+      // find input Date
+      this.is_same = false;
+      this.temp_index = 0;
+      this.temp_length = 0;
+      this.temp_arr_date = [];
+      this.temp_arr_amount = [];
+      this.user_detail = '';
+      this.temp_string = '';
+
+      if(this.what_change == 1) {
         axios({
             method: 'POST',
-            url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+            url: baseurl + '/bakery_product/_mget',
             headers: {
-              Authorization: 'Basic SlhSQ09mclFnOjdiMWM1NmQ4LWZhNmEtNDlmNS1iZTIxLTEzNWJiY2VkZmExMA==',
+              Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
               'Content-Type': 'application/json'
             },
             data: {
-              'doc': {
-                'pAmount': this.user_amount,
-              }
+              "docs": [{
+                "_id": product_id,
+              }, ]
             }
           })
           .then((response) => {
-            //var hits_length = response.data.hits.hits.length
             console.log(response);
-            alert("[수량] 변경되었습니다");
-            this.is_clicked = false;
-            window.history.go(0);
+
+            this.temp_length = response.data.docs[0]._source.pDetail.length;
+
+            for (var i = 0; i < this.temp_length; i++) {
+              this.temp_arr_amount.push(response.data.docs[0]._source.pDetail[i].pAmount);
+              this.temp_arr_date.push(response.data.docs[0]._source.pDetail[i].pExpirationDate);
+
+              if (this.user_date.toString() == (this.temp_arr_date[i])) {
+                this.is_same = true;
+                this.temp_index = i;
+                break;
+              }
+            }
+
+            if (this.is_same && this.user_amount >= 0 && this.what_change == 1) {
+              // change AMOUNT
+              this.user_detail = '[';
+
+              for (var i = 0; i < this.temp_length; i++) {
+                this.user_detail += '{ "pAmount" : "';
+                if (i == this.temp_index) {
+                  this.user_detail += this.user_amount;
+                } else {
+                  this.user_detail += this.temp_arr_amount[i];
+                }
+                this.user_detail += '", "pExpirationDate" : "';
+                this.user_detail += this.temp_arr_date[i];
+                if (i != this.temp_length - 1) {
+                  this.user_detail += '" },';
+                } else {
+                  this.user_detail += '" }]';
+                }
+              }
+
+              axios({
+                  method: 'POST',
+                  url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+                  headers: {
+                    Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+                    'Content-Type': 'application/json'
+                  },
+                  data: {
+                    'doc': {
+                      'pDetail': JSON.parse(this.user_detail),
+                    }
+                  }
+                })
+                .then((response) => {
+                  //var hits_length = response.data.hits.hits.length
+                  console.log(response);
+                  alert("[수량] 변경되었습니다");
+                  this.is_clicked = false;
+                  window.history.go(0);
+                }).catch((e) => {
+                  console.log(e.response)
+                })
+            } else if (this.is_same == false && this.what_change == 1) {
+              alert("에러: 유통기한에 해당하는 물품 없음");
+            } else if (this.user_amount < 0) {
+              alert("에러: 음수를 입력할 수 없습니다!");
+            }
           }).catch((e) => {
             console.log(e.response)
           })
+      }
 
-      } else if(this.user_amount >= 0 && this.what_change == 2) {
+      if (this.user_amount >= 0 && this.what_change == 2) {
         // change PRICE
         axios({
             method: 'POST',
             url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
             headers: {
-              Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+              Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
               'Content-Type': 'application/json'
             },
             data: {
@@ -195,8 +298,59 @@ export default {
           }).catch((e) => {
             console.log(e.response)
           })
-      } else if(this.user_amount < 0){
-        alert("음수를 입력할 수 없습니다!");
+      }
+
+      if(this.user_amount >= 0 && this.what_change == 3) {
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_product/_mget',
+            headers: {
+              Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              "docs": [{
+                "_id": product_id,
+              }, ]
+            }
+          })
+          .then((response) => {
+            console.log(response);
+            this.temp_string = JSON.stringify(response.data.docs[0]._source.pDetail);
+
+            var new_string = ', { "pAmount" : "' + this.user_amount + '", "pExpirationDate" : "' + this.user_date + '"} ]';
+            var i = this.temp_string.indexOf(']');
+            this.temp_string = this.temp_string.substring(0, i);
+            this.temp_string += new_string;
+
+            axios({
+                method: 'POST',
+                url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+                headers: {
+                  Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+                  'Content-Type': 'application/json'
+                },
+                data: {
+                  'doc': {
+                    'pDetail': JSON.parse(this.temp_string),
+                  }
+                }
+              })
+              .then((response) => {
+                console.log(response);
+                alert("[물품] 입고되었습니다");
+                this.is_clicked = false;
+                window.history.go(0);
+              }).catch((e) => {
+                console.log(e.response)
+              })
+
+
+          }).catch((e) => {
+            console.log(e.response)
+          })
+
+
       }
     },
 
@@ -210,6 +364,12 @@ export default {
       this.now_product_name = name;
       this.is_clicked = true;
       this.what_change = 2;
+    },
+
+    edit_clicked_3(name) {
+      this.now_product_name = name;
+      this.is_clicked = true;
+      this.what_change = 3;
     },
 
     get_now_name() {
@@ -230,7 +390,7 @@ export default {
           method: 'POST',
           url: baseurl + '/bakery_product/_delete_by_query',
           headers: {
-            Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+            Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
             'Content-Type': 'application/json'
           },
           data: {
@@ -252,26 +412,35 @@ export default {
         })
     },
 
-    delete_clicked(name){
+    delete_clicked(name) {
       this.active = true;
       this.now_product_name = name;
     },
 
-    add_menu(){
+    add_menu() {
+      // create 'amount'-'expire date' json object
+      var temp_json = '[ { "pAmount" : "';
+      temp_json += this.new_pAmount;
+      temp_json += '", "pExpirationDate" : "';
+      temp_json += this.new_pExpire;
+      temp_json += '"}]';
+
       // post
       axios({
           method: 'POST',
           url: baseurl + '/bakery_product/_doc/',
           headers: {
-            Authorization: 'Basic T0RCbkduSHd6Ojg2ZTM0ZDBkLTA0M2YtNDY5Yy04NTdkLWY5ZDY1MGFhZmZjZQ==',
+            Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
             'Content-Type': 'application/json'
           },
           data: {
             "pName": this.new_pName,
-            "pAmount": this.new_pAmount,
             "pPrice": this.new_pPrice,
             "pCategory": this.new_pCategory,
-            "pExpireDate": this.new_pExpire,
+            "pDescription": this.new_pDescript,
+            "pBarcode": this.new_pBarcode,
+            "pDetail": JSON.parse(temp_json),
+            "pCost": this.new_pCost,
           }
         })
         .then((response) => {
@@ -280,6 +449,47 @@ export default {
           alert("추가되었습니다");
           this.showDialog = false;
           window.history.go(0);
+        }).catch((e) => {
+          console.log(e.response)
+        })
+
+    },
+
+    show_pDetail(id, name) {
+      this.now_product_name = name;
+      this.temp_length = 0;
+      this.temp_arr_date = [];
+      this.temp_arr_amount = [];
+      var html = ''
+
+      axios({
+          method: 'POST',
+          url: baseurl + '/bakery_product/_mget',
+          headers: {
+            Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "docs": [{
+              "_id": id,
+            }, ]
+          }
+        })
+        .then((response) => {
+          console.log(response);
+
+          this.temp_length = response.data.docs[0]._source.pDetail.length;
+
+          for (var i = 0; i < this.temp_length; i++) {
+            html += "<div>"
+            html += '수량: ';
+            html += (response.data.docs[0]._source.pDetail[i].pAmount);
+            html += ' 유통기한: ';
+            html += (response.data.docs[0]._source.pDetail[i].pExpirationDate);
+            html += "</div>"
+          }
+          document.getElementById("detail_lists").innerHTML = html;
+
         }).catch((e) => {
           console.log(e.response)
         })

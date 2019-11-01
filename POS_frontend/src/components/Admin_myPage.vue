@@ -10,11 +10,11 @@
 
       <div class="description">
         <h6 style="margin-top: 40px; margin-bottom:15px;">[관리자 정보]</h6>
-        관리자 이름: {{ this.admin_name }}
+        관리자 이름: <span class="user_info">{{ this.admin_name }}</span>
         <div class="crack" />
-        관리자 이메일: {{ this.admin_email }}
+        관리자 이메일: <span class="user_info">{{ this.admin_email }}</span>
         <div class="crack" />
-        관리자 비밀번호: {{ this.admin_pwd }}
+        관리자 비밀번호: <span class="user_info">{{ this.admin_pwd }}</span>
         <span>
           <span>
               <md-dialog :md-active.sync="showDialog">
@@ -75,9 +75,9 @@ export default {
     // axios POST
     axios({
         method: 'POST',
-        url: baseurl + '/bakery_users/_mget',
+        url: baseurl + '/bakery_admin/_mget',
         headers: {
-          Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+          Authorization: 'Basic dWNfTnc5ZFd6dUZJOmMzNGI5MjhmLWI5YmQtNGM2Ni1iMmMzLTA0MDc5NWJlZDg4ZA==',
           'Content-Type': 'application/json'
         },
         data: {
@@ -91,9 +91,9 @@ export default {
       .then((response) => {
         console.log(response);
 
-        this.admin_name = response.data.docs[0]._source.uName;
-        this.admin_email = response.data.docs[0]._source.uEmail;
-        this.admin_pwd = response.data.docs[0]._source.uPassword;
+        this.admin_name = response.data.docs[0]._source.name;
+        this.admin_email = response.data.docs[0]._source.email;
+        this.admin_pwd = response.data.docs[0]._source.password;
 
       }).catch((e) => {
         console.log(e.response)
@@ -111,14 +111,14 @@ export default {
         // axios POST
         axios({
             method: 'POST',
-            url: baseurl + '/bakery_users/_doc/' + this.uid + '/_update',
+            url: baseurl + '/bakery_admin/_doc/' + this.uid + '/_update',
             headers: {
-              Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+              Authorization: 'Basic dWNfTnc5ZFd6dUZJOmMzNGI5MjhmLWI5YmQtNGM2Ni1iMmMzLTA0MDc5NWJlZDg4ZA==',
               'Content-Type': 'application/json'
             },
             data: {
               'doc': {
-                'uPassword': this.pwd,
+                'password': this.pwd,
               }
             }
           })
@@ -185,5 +185,9 @@ export default {
 
 .crack {
   margin-bottom: 10px;
+}
+
+.user_info{
+  color: blue;
 }
 </style>

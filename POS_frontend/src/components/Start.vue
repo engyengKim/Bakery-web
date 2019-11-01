@@ -7,7 +7,7 @@
           <h1 id="theme">POS Web</h1><br><br>
           <p id="description" class="lead">
             <font color="black">
-              <h3>안녕하세요, 매장 관리자/총괄 관리자님</h3><br>
+              <h3>안녕하세요, 매장 매니저/총괄 관리자님</h3><br>
               <h6>로그인을 해주십시오</h6>
             </font>
           </p>
