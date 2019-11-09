@@ -15,6 +15,7 @@ import Admin_Home from '@/components/Admin_Home'
 import Admin_myPage from '@/components/Admin_myPage'
 import Admin_manage from '@/components/Admin_manage'
 import Admin_Login from '@/components/Admin_Login'
+import Revenue_monthly from '@/components/Revenue_monthly'
 
 Vue.use(Router)
 
@@ -94,6 +95,11 @@ export default new Router({
       path: '/admin_login',
       name: 'Admin_Login',
       component: Admin_Login
+    },
+    {
+      path: '/revenue_monthly',
+      name: 'Revenue_monthly',
+      component: Revenue_monthly
     },
   ]
 })

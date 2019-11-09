@@ -11,7 +11,8 @@
       <div id="app">
         <reactive-base app="bakery_record" credentials="TqzgC7pxS:222d2517-2375-4324-bf75-13085ec4aa7d">
           <div class="filters-container">
-            <multi-list componentId="rDate" dataField="rDate" class="filter" title="날짜를 선택하세요" selectAllLabel="전체" :defaultQuery="this.defaultQuery" />
+            <multi-list componentId="rDate" dataField="rDate.keyword" class="filter" title="날짜를 선택하세요" selectAllLabel="전체" :defaultQuery="this.defaultQuery" />
+            <md-button class="md-raised md-accent" style="margin-left: 15px; width:200px;" v-on:click="goto_revenue_monthly()">월별 판매 관리</md-button>
           </div>
 
           <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['rDate']}" :defaultQuery="this.defaultQuery">
@@ -55,7 +56,7 @@ import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
 
 export default {
-  name: 'Order',
+  name: 'Revenue',
   data() {
     return {
       uid: '',
@@ -128,6 +129,10 @@ export default {
         }).catch((e) => {
           console.log(e.response)
         })
+    },
+
+    goto_revenue_monthly() {
+      this.$router.replace('/revenue_monthly');
     },
 
   }
