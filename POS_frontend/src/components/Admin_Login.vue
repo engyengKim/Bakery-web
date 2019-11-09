@@ -2,13 +2,13 @@
 <div class="container" id="login-container">
 
   <div id="login">
-    <h3 class="text-center text-white pt-5">Welcome to Bakery POS Web!</h3>
+    <h3 class="text-center text-white pt-5">Welcome to Bakery Admin Web!</h3>
     <div class="container">
       <div id="login-row" class="row justify-content-center align-items-center">
         <div id="login-column" class="col-md-6">
           <div id="login-box" class="col-md-12" style="height: 402px;">
             <form id="login-form" class="form" @submit.prevent="loginFunction">
-              <h3 class="text-center text-info">로그인</h3>
+              <h3 class="text-center text-info">관리자 로그인</h3>
               <div class="form-group">
                 <label for="uEmail" class="text-info">이메일:</label><br>
                 <input type="email" name="uEmail" id="uEmail" v-model="uEmail" class="form-control">
@@ -19,10 +19,9 @@
               </div>
 
               <div class="form-group">
+                <p id="securityWarning">관리자 계정 보안에 유의하시기 바랍니다</p>
                 <button class="btn btn-success">로그인</button>
                 <div id="register-link" class="text-right">
-                  <p>Bakery-web 매니저 계정이 없으신가요?</p>
-                  <a href="#" class="text-info">등록 정보</a>
                   <div style="margin-bottom: 10px;" />
                   <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
                 </div>
@@ -40,7 +39,7 @@
 
 <script>
 import axios from 'axios'
-const baseurl = 'https://scalr.api.appbase.io/bakery_manager'
+const baseurl = 'https://scalr.api.appbase.io/bakery_admin'
 var currentUserId = ''
 
 export default {
@@ -51,9 +50,9 @@ export default {
       'uPassword': ''
     }
   },
-  created() {
-    if(this.$session.get('type') == 'Manager'){
-      this.$router.replace('/home')
+  created(){
+    if(this.$session.exists() && this.$session.get('type') == 'Admin'){
+      this.$router.replace('/Admin_Home')
     }
   },
   methods: {
@@ -62,7 +61,7 @@ export default {
                method: 'POST',
                url: baseurl+'/_search',
                headers: {
-                   Authorization: 'Basic V1E3M0ZKMk1lOjkzZWJiNjNlLWE1MWMtNDJmNS04YjhlLTY5YzBjNjY0YjdkMw==',
+                   Authorization: 'Basic S0IzSFZ4R2dIOmU5YjRkYzU4LTM1MjgtNDZiMi1hZDU3LTA5MDVjMzRmNjU2NA==',
                    'Content-Type': 'application/json'
                },
                data: {
@@ -82,14 +81,13 @@ export default {
                    currentUserId = response.data.hits.hits[0]._id
                    var currentUserName = response.data.hits.hits[0]._source.name
                    var currentUserType = response.data.hits.hits[0]._source.type
-                   var currentStoreName = response.data.hits.hits[0]._source.storeName
                    this.$session.set('uId', currentUserId)
                    this.$session.set('type', currentUserType)
-                   this.$session.set('storeName', currentStoreName)
                    console.log("CONFIRM!")
                    console.log("Current User ID is :"+currentUserId)
-                   alert('어서오세요! '+currentUserName+'님')
-                   this.$router.push('/home')
+                   console.log("Current User TYPE is :"+currentUserType)
+                   alert('어서오세요! '+currentUserName+'관리자 님')
+                   this.$router.push('/Admin_Home')
                }
                else{
                    currentUserId = ''
@@ -163,5 +161,8 @@ body {
 
 #login-container {
   font-family: 'Noto Sans KR', sans-serif;
+}
+#securityWarning {
+   color: red;
 }
 </style>

@@ -17,12 +17,14 @@
         </div>
 
         <div class="item2">
-          <reactive-base app="bakery_product" credentials="5xTGpCL5N:ddd1d6b3-6022-4e2f-ba6f-13805e7b9659">
+          <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
             <div class="item5">
-              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false" :showCount="false" />
+              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false"
+              :showCount="false" :defaultQuery="this.defaultQuery" />
             </div>
 
-            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :showResultStats="false" :pagination="true" :from="0" :size="5"
+            :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
@@ -122,15 +124,12 @@ export default {
       product_id: [],
       product_original_amount: [],
 
-      user_amount: null,
       now_product_name: '',
       is_clicked: false,
       active: false,
       showDialog: false,
       tot_price: 0,
-      user_money: null,
       remain: null,
-      user_barcode: null,
       ok_pressed: false,
       gift_number: null,
       is_remain: false,
@@ -139,17 +138,32 @@ export default {
       buying_date: null,
       buying_store: null,
       buying_manager: null,
+
+      user_barcode: null,
+      user_money: null,
+      user_amount: null,
+      user_name: null,
+
+
     }
   },
+
   created() {
+
+    console.log("type:" + this.$session.type)
+    if (this.$session.get('type') != 'Manager') {
+      alert("매니저 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+
     this.uid = this.$session.get('uId');
 
     // axios POST
     axios({
         method: 'POST',
-        url: baseurl + '/bakery_users/_mget',
+        url: baseurl + '/bakery_manager/_mget',
         headers: {
-          Authorization: 'Basic ZWRnZ1JBOVB2OjY3MzM3MjdiLWFlY2YtNGVlOS1iMmExLTBiNmFjN2RhMmMzYw==',
+          Authorization: 'Basic V1E3M0ZKMk1lOjkzZWJiNjNlLWE1MWMtNDJmNS04YjhlLTY5YzBjNjY0YjdkMw==',
           'Content-Type': 'application/json'
         },
         data: {
@@ -161,8 +175,8 @@ export default {
       .then((response) => {
         console.log(response);
 
-        this.buying_manager = response.data.docs[0]._source.uName;
-        this.buying_store = response.data.docs[0]._source.uAddress;
+        this.buying_manager = response.data.docs[0]._source.name;
+        this.buying_store = response.data.docs[0]._source.address;
       }).catch((e) => {
         console.log(e.response)
       })
@@ -172,9 +186,20 @@ export default {
     this.buying_date = currentDateWithFormat;
 
   },
+
   methods: {
     goto_home() {
       this.$router.replace('/home')
+    },
+
+    defaultQuery: function(value, props){
+      return {
+        query: {
+          match: {
+            pManagerID: this.uid
+          }
+        }
+      }
     },
 
     get_name(name, price, id, amount) {
@@ -277,83 +302,100 @@ export default {
     },
 
     pay() {
-      // check amount is valid
-      var amount_is_okay = true;
 
-      for(var i=0; i<this.product_list.length; i++){
-        var product_id = this.product_id[i];
-        var original_amount = this.product_original_amount[i];
-        var new_amount = original_amount - this.product_amount[i];
+      var bakery_coin = 0;
 
-        if(new_amount < 0){
-          // amount is not enough
-          alert("수량이 부족합니다. ["+this.product_list[i]+"]");
-          amount_is_okay = false;
-          break;
-        }
-      }
-
-      if (this.ok_pressed && amount_is_okay) {
+      if (this.ok_pressed) {
         this.remain = null;
         this.showDialog = false;
 
-
-        if (this.is_partial_pay) {
-          //when CASH & Bakery conin
-
-        }else {
-          //axios POST
-          axios({
-              method: 'POST',
-              url: baseurl + '/bakery_record/_doc',
-              headers: {
-                Authorization: 'Basic VGh6MlgydWFVOjMyMmMwYjA3LTI1MmQtNDRlNS1iZDU3LWZhYzE0ODZjNzMwMg==',
-                'Content-Type': 'application/json'
-              },
-              data: {
-                "rStore": this.buying_store,
-                "rSeller": this.buying_manager,
-                "rDate": this.buying_date,
-              }
-            })
-            .then((response) => {
-              console.log(response);
-              alert("DB write success :)");
-            }).catch((e) => {
-              console.log(e.response)
-            })
+        if (this.user_money == null){
+          // only user BakeryCoin
+          this.user_money = 0;
+        }
+        if (this.user_barcode == null){
+          // only use CASH
+          this.user_name = '익명';
         }
 
-        // change amount of products
-        // this.product_list, this.product_amount
-        for(var i=0; i<this.product_list.length; i++){
-          var product_id = this.product_id[i];
-          var original_amount = this.product_original_amount[i];
-          var new_amount = original_amount - this.product_amount[i];
+        // set rDetail: rAmount, rName
+        var user_detail = '[';
+        var length = this.product_list.length;
 
-          // axios POST
-          axios({
-              method: 'POST',
-              url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
-              headers: {
-                Authorization: 'Basic SlhSQ09mclFnOjdiMWM1NmQ4LWZhNmEtNDlmNS1iZTIxLTEzNWJiY2VkZmExMA==',
-                'Content-Type': 'application/json'
-              },
-              data: {
-                "doc": {
-                  "pAmount": new_amount
-                }
-              }
-            })
-            .then((response) => {
-              console.log(response);
-            }).catch((e) => {
-              console.log(e.response)
-            })
+        for (var i = 0; i < length; i++) {
+          user_detail += '{ "rAmount" : "';
+          user_detail += this.product_amount[i];
+          user_detail += '", "rName" : "';
+          user_detail += this.product_list[i];
+          if (i != length - 1) {
+            user_detail += '" },';
+          } else {
+            user_detail += '" }]';
+          }
         }
 
+        // set rType: cash, coin
+        var user_type = '{ "cash" : "';
+        user_type += '0';
+        user_type += '", "coin" : "';
+        user_type += this.user_money;
+        user_type += '" }';
 
-        alert("결제가 성공적으로 진행되었습니다");
+
+        //axios POST
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_record/_doc',
+            headers: {
+              Authorization: 'Basic VHF6Z0M3cHhTOjIyMmQyNTE3LTIzNzUtNDMyNC1iZjc1LTEzMDg1ZWM0YWE3ZA==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              "rStore": this.buying_store,
+              "rDate": this.buying_date,
+              "rBuyer": this.user_name,
+              "rPrice": this.tot_price,
+              "rDetail": JSON.parse(user_detail),
+              "rType": JSON.parse(user_type),
+              "rManagerID": this.uid,
+            }
+          })
+          .then((response) => {
+            console.log(response);
+            alert("record DB에 입력 완료!");
+            // change amount of products
+            for (var i = 0; i < this.product_list.length; i++) {
+              var product_id = this.product_id[i];
+              var original_amount = this.product_original_amount[i];
+              var new_amount = original_amount - this.product_amount[i];
+
+              // axios POST
+              axios({
+                  method: 'POST',
+                  url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+                  headers: {
+                    Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+                    'Content-Type': 'application/json'
+                  },
+                  data: {
+                    "doc": {
+                      "pAmount": new_amount
+                    }
+                  }
+                })
+                .then((response) => {
+                  console.log(response);
+                  alert("결제가 성공적으로 진행되었습니다");
+                  window.history.go(0);
+                }).catch((e) => {
+                  console.log(e.response)
+                })
+            }
+          }).catch((e) => {
+            console.log(e.response)
+          })
+
+
       } else {
         alert("에러: 승인 거부");
       }

@@ -11,25 +11,25 @@
 
 
 
-      <h5 id="theme">고객 관리</h5>
+      <h5 id="theme">매니저 현황</h5>
 
       <div id="app">
-        <reactive-base app="bakery_users" credentials="edggRA9Pv:6733727b-aecf-4ee9-b2a1-0b6ac7da2c3c">
+        <reactive-base app="bakery_manager" credentials="WQ73FJ2Me:93ebb63e-a51c-42f5-8b8e-69c0c664b7d3">
 
-          <div class="filters-container">
-            <multi-list componentId="Category" dataField="uType.keyword" class="filter" title="고객 유형" selectAllLabel="모든 고객" />
-          </div>
-
-          <reactive-list componentId="SearchResult" dataField="_id" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+          <reactive-list componentId="SearchResult" dataField="_id" style="width: 600px;" :showResultStats="false" :pagination="true" :from="0" :size="5">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <span style="font-weight: bold;">{{ item.uName }} </span>
+                    <span style="font-weight: bold;">{{ item.name }}</span>
 
                     <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold;">[주소]</span> {{ item.uAddress}}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[이메일]</span> {{ item.uEmail }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[연락처]</span> {{ item.contact }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[이메일]</span> {{ item.email }}
+                    </div>
+                    <div class="product_info">
+                      <span style="color: #425DC6; font-weight:bold;">[가게 주소]</span> {{ item.address}}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가게 이름]</span> {{ item.storeName }}
                     </div>
 
                   </div>
@@ -41,6 +41,30 @@
       </div>
 
 
+      <h5 id="theme">가입 고객 현황</h5>
+
+      <div id="app">
+        <reactive-base app="bakery_customer" credentials="1GnSwfXne:9ea005c6-da1d-4ab0-9516-52fbc31ecd9c">
+
+          <reactive-list componentId="SearchResult" dataField="_id" style="width: 600px;" :showResultStats="false" :pagination="true" :from="0" :size="5">
+            <div slot="renderData" slot-scope="{ item }">
+              <div class="flex book-content" key="item._id">
+                <div class="flex column justify-center ml20">
+                  <div class="inline-1">
+                    <span style="font-weight: bold;">{{ item.name }}</span>
+
+                    <div class="product_info">
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[연락처]</span> {{ item.contact }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[이메일]</span> {{ item.email }}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </reactive-list>
+        </reactive-base>
+      </div>
 
     </div>
   </div>
@@ -63,6 +87,17 @@ export default {
 
     };
   },
+
+  created(){
+
+    if(this.$session.get('type') != 'Admin' && this.$session.exists()){
+
+      this.$session.destroy();
+      alert("관리자 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+  },
+
   methods: {
     goto_home() {
       this.$router.replace('/admin_home')

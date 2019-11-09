@@ -38,6 +38,17 @@ export default {
   data() {
     return {}
   },
+
+  created(){
+
+    if(this.$session.get('type') != 'Admin'){
+
+      this.$session.destroy();
+      alert("관리자 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+  },
+  
   methods: {
     goto_manage() {
       this.$router.replace('/admin_manage')

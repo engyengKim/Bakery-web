@@ -13,7 +13,8 @@
           </p>
 
           <div>
-            <button type="button" class="btn btn-warning" v-on:click="goto_login()">로그인</button>
+            <button type="button" class="btn btn-warning" v-on:click="goto_adminLogin()">관리자 로그인</button>
+            <button type="button" class="btn btn-warning" v-on:click="goto_login()">매니저 로그인</button>
           </div>
         </div>
       </div>
@@ -33,6 +34,9 @@ export default {
     goto_login() {
       this.$router.replace('/login')
     },
+    goto_adminLogin() {
+      this.$router.replace('/Admin_Login')
+    }
   }
 }
 </script>
