@@ -70,6 +70,14 @@ export default {
   },
 
   created() {
+
+    if(this.$session.get('type') != 'Admin'){
+
+      this.$session.destroy();
+      alert("관리자 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+
     this.uid = this.$session.get('uId');
 
     // axios POST
@@ -77,7 +85,7 @@ export default {
         method: 'POST',
         url: baseurl + '/bakery_admin/_mget',
         headers: {
-          Authorization: 'Basic dWNfTnc5ZFd6dUZJOmMzNGI5MjhmLWI5YmQtNGM2Ni1iMmMzLTA0MDc5NWJlZDg4ZA==',
+          Authorization: 'Basic S0IzSFZ4R2dIOmU5YjRkYzU4LTM1MjgtNDZiMi1hZDU3LTA5MDVjMzRmNjU2NA==',
           'Content-Type': 'application/json'
         },
         data: {
@@ -113,7 +121,7 @@ export default {
             method: 'POST',
             url: baseurl + '/bakery_admin/_doc/' + this.uid + '/_update',
             headers: {
-              Authorization: 'Basic dWNfTnc5ZFd6dUZJOmMzNGI5MjhmLWI5YmQtNGM2Ni1iMmMzLTA0MDc5NWJlZDg4ZA==',
+              Authorization: 'Basic S0IzSFZ4R2dIOmU5YjRkYzU4LTM1MjgtNDZiMi1hZDU3LTA5MDVjMzRmNjU2NA==',
               'Content-Type': 'application/json'
             },
             data: {

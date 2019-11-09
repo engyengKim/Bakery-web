@@ -136,7 +136,15 @@ export default {
 
     };
   },
+  
   created() {
+
+    console.log("type:"+this.$session.type)
+    if(this.$session.get('type') != 'Manager'){
+      alert("매니저 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+
     this.uid = this.$session.get('uId');
 
     // axios POST
@@ -173,6 +181,7 @@ export default {
 
 
   },
+
   methods: {
     goto_home() {
       this.$router.replace('/home')

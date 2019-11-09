@@ -14,7 +14,7 @@ import MyPage from '@/components/MyPage'
 import Admin_Home from '@/components/Admin_Home'
 import Admin_myPage from '@/components/Admin_myPage'
 import Admin_manage from '@/components/Admin_manage'
-
+import Admin_Login from '@/components/Admin_Login'
 
 Vue.use(Router)
 
@@ -90,6 +90,10 @@ export default new Router({
       name: 'Admin_manage',
       component: Admin_manage
     },
-
+    {
+      path: '/admin_login',
+      name: 'Admin_Login',
+      component: Admin_Login
+    },
   ]
 })

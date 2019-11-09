@@ -7,11 +7,16 @@
   <div class="container">
     <div class="text-field">
       <h5 id="theme">재고 관리 시스템</h5>
+      <div>'수량' 정보는 판매로 인한 수량 변동을 반영하지 않습니다.</div>
+      <div>따라서, 매장 닫기 전에, 수량을 확인하시고 [현재 수량] 값에 마추어 '수량'값을 조정해주세요</div>
 
       <div id="app">
         <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
           <div class="filters-container">
-            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품" />
+            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품"
+            :defaultQuery="this.defaultQuery" />
+
+            <div style="font-weight:bold; margin-left:auto; margin-right:auto;">오늘 날짜: {{ this.today }} </div>
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
 
             <div style="margin-left:auto; margin-right:auto;">
@@ -68,7 +73,8 @@
             </div>
 
           </div>
-          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false"
+          :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item.pName">
                 <div class="flex column justify-center ml20">
@@ -77,6 +83,7 @@
 
                     <div class="product_info">
                       <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
+                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[현재 수량]</span> {{ item.pAmount }}
                     </div>
 
 
@@ -92,7 +99,7 @@
                         <div class="input-group-append" style="margin-left:5px;">
                           <input type="text" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px; margin-right: 5px;" placeholder="수량">
                           <input type="date" v-model="user_date" class="form-control" id="input_amount">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px; margin-right:5px;">저장</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id, item.pPrice)" style="margin-left:5px; margin-right:5px;">저장</md-button>
                         </div>
                       </div>
 
@@ -101,7 +108,7 @@
                         <div class="input-group-append" style="margin-left:5px;">
                           <input type="text" v-model="user_amount" class="form-control" id="input_amount" style="width: 80px; margin-right: 5px;" placeholder="수량">
                           <input type="date" v-model="user_date" class="form-control" id="input_amount">
-                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px; margin-right:5px; background-color:green;">저장</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-primary" v-on:click="save_db(item.pName, item._id, item.pPrice)" style="margin-left:5px; margin-right:5px; background-color:green;">저장</md-button>
                         </div>
                       </div>
 
@@ -110,7 +117,7 @@
                       <div v-if="(get_now_name() == item.pName) && is_clicked && (get_what_change() == 2)">
                         <div class="input-group-append" style="margin-left:5px;">
                           <input type="user_amount" v-model="user_amount" class="form-control" id="input_amount" style="width: 100px;">
-                          <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="save_db(item.pName, item._id)" style="margin-left:5px;">저장</md-button>
+                          <md-button class="md-icon-button md-raised md-dense md-accent" v-on:click="save_db(item.pName, item._id, item.pPrice)" style="margin-left:5px;">저장</md-button>
                         </div>
                       </div>
 
@@ -171,16 +178,44 @@ export default {
       temp_string: null,
 
       is_same: false,
-
+      uid: null,
+      storeName: '',
+      today: null,
     };
   },
+
+  created(){
+    if(this.$session.get('type') != 'Manager' && this.$session.exists()){
+      this.$session.destroy()
+      alert("매니저 계정으로 로그인 해주세요")
+      this.$router.replace('/')
+    }
+
+    this.uid = this.$session.get('uId');
+    this.storeName = this.$session.get('storeName');
+
+    var currentDate = new Date();
+    var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+    this.today = currentDateWithFormat;
+  },
+
   methods: {
+
+    defaultQuery: function(value, props) {
+      return {
+        query: {
+          match: {
+            pManagerID: this.uid
+          }
+        }
+      }
+    },
 
     goto_home() {
       this.$router.replace('/home')
     },
 
-    save_db(name, product_id) {
+    save_db(name, product_id, old_price) {
       // pass [name, amount] to server
 
       // find input Date
@@ -209,6 +244,7 @@ export default {
           .then((response) => {
             console.log(response);
 
+            var old_amount = null;
             this.temp_length = response.data.docs[0]._source.pDetail.length;
 
             for (var i = 0; i < this.temp_length; i++) {
@@ -218,6 +254,8 @@ export default {
               if (this.user_date.toString() == (this.temp_arr_date[i])) {
                 this.is_same = true;
                 this.temp_index = i;
+                old_amount = this.temp_arr_amount[i];
+                this.temp_arr_amount[i] = this.user_amount;
                 break;
               }
             }
@@ -242,6 +280,12 @@ export default {
                 }
               }
 
+              var tot_num = 0;
+
+              for (var i = 0; i < this.temp_length; i++){
+                tot_num += parseInt(this.temp_arr_amount[i]);
+              }
+
               axios({
                   method: 'POST',
                   url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
@@ -252,15 +296,47 @@ export default {
                   data: {
                     'doc': {
                       'pDetail': JSON.parse(this.user_detail),
+                      'pAmount': tot_num,
                     }
                   }
                 })
                 .then((response) => {
                   //var hits_length = response.data.hits.hits.length
                   console.log(response);
-                  alert("[수량] 변경되었습니다");
-                  this.is_clicked = false;
-                  window.history.go(0);
+
+                  // set hContents
+                  var contents = '수량 변경 | 제품명: ';
+                  contents += name;
+                  contents += ' | 유통기한: ';
+                  contents += this.temp_arr_date[this.temp_index];
+                  contents += ' | 수량: ';
+                  contents += old_amount;
+                  contents += '에서 ';
+                  contents += this.user_amount;
+
+
+                  axios({
+                      method: 'POST',
+                      url: baseurl + '/bakery_history/_doc/',
+                      headers: {
+                        Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                        'Content-Type': 'application/json'
+                      },
+                      data: {
+                        "hContents": contents,
+                        "hDate": this.today,
+                        "hManagerID": this.uid,
+                      }
+                    })
+                    .then((response) => {
+                      //var hits_length = response.data.hits.hits.length
+                      console.log(response);
+                      alert("[수량] 변경, 기록되었습니다");
+                      this.is_clicked = false;
+                      window.history.go(0);
+                    }).catch((e) => {
+                      console.log(e.response)
+                    })
                 }).catch((e) => {
                   console.log(e.response)
                 })
@@ -292,9 +368,37 @@ export default {
           .then((response) => {
             //var hits_length = response.data.hits.hits.length
             console.log(response);
-            alert("[가격] 변경되었습니다");
-            this.is_clicked = false;
-            window.history.go(0);
+
+            // set hContents
+            var contents = '가격 변경 | 제품명: ';
+            contents += name;
+            contents += ' | 가격: ';
+            contents += old_price;
+            contents += '에서 ';
+            contents += this.user_amount;
+
+            axios({
+                method: 'POST',
+                url: baseurl + '/bakery_history/_doc/',
+                headers: {
+                  Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                  'Content-Type': 'application/json'
+                },
+                data: {
+                  "hContents": contents,
+                  "hDate": this.today,
+                  "hManagerID": this.uid,
+                }
+              })
+              .then((response) => {
+                //var hits_length = response.data.hits.hits.length
+                console.log(response);
+                alert("[가격] 변경, 기록되었습니다");
+                this.is_clicked = false;
+                window.history.go(0);
+              }).catch((e) => {
+                console.log(e.response)
+              })
           }).catch((e) => {
             console.log(e.response)
           })
@@ -317,6 +421,7 @@ export default {
           .then((response) => {
             console.log(response);
             this.temp_string = JSON.stringify(response.data.docs[0]._source.pDetail);
+            var original_amount = response.data.docs[0]._source.pAmount;
 
             var new_string = ', { "pAmount" : "' + this.user_amount + '", "pExpirationDate" : "' + this.user_date + '"} ]';
             var i = this.temp_string.indexOf(']');
@@ -333,24 +438,49 @@ export default {
                 data: {
                   'doc': {
                     'pDetail': JSON.parse(this.temp_string),
+                    'pAmount': (original_amount + parseInt(this.user_amount)),
                   }
                 }
               })
               .then((response) => {
                 console.log(response);
-                alert("[물품] 입고되었습니다");
-                this.is_clicked = false;
-                window.history.go(0);
+
+                // set hContents
+                var contents = '물품 입고 | 제품명: ';
+                contents += name;
+                contents += ' | 유통기한: ';
+                contents += this.user_date;
+                contents += ' | 수량: ';
+                contents += parseInt(this.user_amount);
+
+                axios({
+                    method: 'POST',
+                    url: baseurl + '/bakery_history/_doc/',
+                    headers: {
+                      Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                      'Content-Type': 'application/json'
+                    },
+                    data: {
+                      "hContents": contents,
+                      "hDate": this.today,
+                      "hManagerID": this.uid,
+                    }
+                  })
+                  .then((response) => {
+                    //var hits_length = response.data.hits.hits.length
+                    console.log(response);
+                    alert("[물품] 입고, 기록되었습니다");
+                    this.is_clicked = false;
+                    window.history.go(0);
+                  }).catch((e) => {
+                    console.log(e.response)
+                  })
               }).catch((e) => {
                 console.log(e.response)
               })
-
-
           }).catch((e) => {
             console.log(e.response)
           })
-
-
       }
     },
 
@@ -441,6 +571,8 @@ export default {
             "pBarcode": this.new_pBarcode,
             "pDetail": JSON.parse(temp_json),
             "pCost": this.new_pCost,
+            "pAmount": this.new_pAmount,
+            "pStore": this.storeName,
           }
         })
         .then((response) => {
@@ -531,7 +663,7 @@ export default {
   flex-direction: column;
   position: absolute;
   left: 0;
-  margin-top: 100px;
+  margin-top: 140px;
   top: 0;
   scroll-behavior: smooth;
   justify-content: center;
