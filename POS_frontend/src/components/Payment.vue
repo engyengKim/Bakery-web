@@ -28,7 +28,7 @@
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
-                    <md-button v-on:click='get_name(item.pName, item.pPrice, item._id, item.pAmount)'>{{ item.pName }}</md-button>
+                    <md-button v-on:click='get_name(item.pName, item.pPrice, item._id)'>{{ item.pName }}</md-button>
                     <span>
                       <font style="color:gray;">{{item.pPrice}}</font>
                     </span>
@@ -122,7 +122,6 @@ export default {
       product_amount: [],
       product_price: [],
       product_id: [],
-      product_original_amount: [],
 
       now_product_name: '',
       is_clicked: false,
@@ -202,7 +201,7 @@ export default {
       }
     },
 
-    get_name(name, price, id, amount) {
+    get_name(name, price, id) {
       this.product_name = name
 
       if (this.product_list.includes(name)) {
@@ -211,7 +210,6 @@ export default {
         this.product_list.push(name)
         this.product_amount.push(1)
         this.product_id.push(id)
-        this.product_original_amount.push(amount)
 
         this.tot_price += parseInt(price)
       }
@@ -232,7 +230,6 @@ export default {
       this.product_list = []
       this.product_amount = []
       this.product_id = []
-      this.product_original_amount = []
 
       this.tot_price = 0
       document.getElementById("lists").innerHTML = this.product_list
@@ -247,7 +244,6 @@ export default {
         this.product_list.splice(a, 1);
         this.product_amount.splice(a, 1);
         this.product_id.splice(a, 1);
-        this.product_original_amount.splice(a, 1);
 
         this.tot_price -= temp;
 
@@ -257,8 +253,8 @@ export default {
           html += '<td>' + this.product_list[i] + '</td>';
           html += '<td>' + this.product_amount[i] + '</td>';
           html += '</tr>';
-
         }
+
         html += '</table>';
         document.getElementById("lists").innerHTML = html;
       }
@@ -363,38 +359,12 @@ export default {
           .then((response) => {
             console.log(response);
             alert("record DB에 입력 완료!");
-            // change amount of products
-            for (var i = 0; i < this.product_list.length; i++) {
-              var product_id = this.product_id[i];
-              var original_amount = this.product_original_amount[i];
-              var new_amount = original_amount - this.product_amount[i];
+            alert("결제가 성공적으로 진행되었습니다");
+            window.history.go(0);
 
-              // axios POST
-              axios({
-                  method: 'POST',
-                  url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
-                  headers: {
-                    Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
-                    'Content-Type': 'application/json'
-                  },
-                  data: {
-                    "doc": {
-                      "pAmount": new_amount
-                    }
-                  }
-                })
-                .then((response) => {
-                  console.log(response);
-                  alert("결제가 성공적으로 진행되었습니다");
-                  window.history.go(0);
-                }).catch((e) => {
-                  console.log(e.response)
-                })
-            }
           }).catch((e) => {
             console.log(e.response)
           })
-
 
       } else {
         alert("에러: 승인 거부");
@@ -455,7 +425,6 @@ export default {
       this.product_amount = [];
       this.product_price = [];
       this.product_id = [];
-      this.product_original_amount = [];
 
       document.getElementById("lists").innerHTML = this.product_list
     },
