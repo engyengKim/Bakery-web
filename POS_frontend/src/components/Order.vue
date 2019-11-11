@@ -16,15 +16,28 @@
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[고객 ID]</span> {{ item.aoCustomer_id }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[방문 날짜]</span> {{ item.aoVisitDate }}<br>
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[제품]</span> {{ item.aoProduct }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[수량]</span> {{ item.aoAmount }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[요구사항]</span> {{ item.aoRequestContent }}
-                    </div>
+                    <table style="width:500px;">
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[고객 ID]</td>
+                        <td>{{ item.aoCustomer_id }}</td>
+                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[방문 날짜]</td>
+                        <td>{{ item.aoVisitDate }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[제품]</td>
+                        <td>{{ item.aoProduct }}</td>
+                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[수량]</td>
+                        <td>{{ item.aoAmount }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[요구사항]</td>
+                        <td>{{ item.aoRequestContent }}</td>
+                      </tr>
+                    </table>
 
-                    <md-button class="md-primary md-raised md-dense" v-on:click="deal_complete(item._id)" style="margin-left:10px; margin-top:10px; margin-bottom:5px;">처리 완료</md-button>
+                    <md-button class="md-accent md-raised md-dense" v-on:click="deal_complete(item._id)" style="margin-left:3px; margin-top:10px; margin-bottom:10px;">
+                      처리 완료
+                    </md-button>
                   </div>
                 </div>
               </div>

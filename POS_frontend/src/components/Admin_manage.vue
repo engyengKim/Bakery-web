@@ -16,21 +16,35 @@
       <div id="app">
         <reactive-base app="bakery_manager" credentials="WQ73FJ2Me:93ebb63e-a51c-42f5-8b8e-69c0c664b7d3">
 
-          <reactive-list componentId="SearchResult" dataField="_id" style="width: 600px;" :showResultStats="false" :pagination="true" :from="0" :size="5">
+          <reactive-list componentId="SearchResult" dataField="_id" style="width:800px;" :showResultStats="false" :pagination="true" :from="0" :size="5" sortBy="asc">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <span style="font-weight: bold;">{{ item.name }}</span>
+                    <table>
+                      <tr>
+                        <td style="font-weight: bold;">{{ item.name }}</td>
+                      </tr>
 
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[연락처]</span> {{ item.contact }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[이메일]</span> {{ item.email }}
-                    </div>
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold;">[가게 주소]</span> {{ item.address}}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가게 이름]</span> {{ item.storeName }}
-                    </div>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; width:100px;">[연락처]</td>
+                        <td style="width:200px;">{{ item.contact }}</td>
+                        <td style="color: #425DC6; font-weight:bold; width:100px;">[이메일]</td>
+                        <td style="width:300px;">{{ item.email }}</td>
+                      </tr>
+
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold;">[가게 이름]</td>
+                        <td>{{ item.storeName }}</td>
+                      </tr>
+
+
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold;">[가게 주소]</td>
+                        <td>{{ item.address}}</td>
+                      </tr>
+
+                    </table>
 
                   </div>
                 </div>
@@ -41,22 +55,27 @@
       </div>
 
 
-      <h5 id="theme">가입 고객 현황</h5>
+      <h5 id="theme">고객 현황</h5>
 
       <div id="app">
         <reactive-base app="bakery_customer" credentials="1GnSwfXne:9ea005c6-da1d-4ab0-9516-52fbc31ecd9c">
 
-          <reactive-list componentId="SearchResult" dataField="_id" style="width: 600px;" :showResultStats="false" :pagination="true" :from="0" :size="5">
+          <reactive-list componentId="SearchResult" dataField="_id" style="width: 800px;" :showResultStats="false" :pagination="true" :from="0" :size="5" sortBy="asc">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <span style="font-weight: bold;">{{ item.name }}</span>
-
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[연락처]</span> {{ item.contact }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[이메일]</span> {{ item.email }}
-                    </div>
+                    <table>
+                      <tr>
+                        <td style="font-weight: bold;">{{ item.name }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; width:100px;">[연락처]</td>
+                        <td style="width:200px;"> {{ item.contact }}</td>
+                        <td style="color: #425DC6; font-weight:bold; width:100px;">[이메일]</td>
+                        <td style="width:300px;">{{ item.email }}</td>
+                      </tr>
+                    </table>
 
                   </div>
                 </div>
@@ -88,9 +107,9 @@ export default {
     };
   },
 
-  created(){
+  created() {
 
-    if(this.$session.get('type') != 'Admin' && this.$session.exists()){
+    if (this.$session.get('type') != 'Admin' && this.$session.exists()) {
 
       this.$session.destroy();
       alert("관리자 계정으로 로그인 해주세요")
@@ -136,9 +155,9 @@ export default {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.filters-container{
+.filters-container {
   width: 20%;
-  margin-left:30px;
+  margin-left: 30px;
   margin-top: 200px;
   display: inline-flex;
   flex-direction: column;
@@ -146,5 +165,9 @@ export default {
   justify-content: center;
   transition: all ease 0.2s;
   overflow: hidden;
+}
+
+td {
+  border: 1px solid #666666;
 }
 </style>
