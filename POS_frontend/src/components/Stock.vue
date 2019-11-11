@@ -8,7 +8,7 @@
     <div class="text-field">
       <h5 id="theme">재고 관리 시스템</h5>
       <div>'수량' 정보는 판매로 인한 수량 변동을 반영하지 않습니다.</div>
-      <div>따라서, 매장 닫기 전에, 수량을 확인하시고 [현재 수량] 값에 마추어 '수량'값을 조정해주세요</div>
+      <div>따라서, 매장 닫기 전에, 수량을 확인하시고 [현재 수량] 값에 맞추어 '수량'값을 조정해주세요</div>
 
       <div id="app">
         <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
@@ -72,7 +72,8 @@
             </div>
 
           </div>
-          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5"
+          :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item.pName">
                 <div class="flex column justify-center ml20">
@@ -81,7 +82,6 @@
 
                     <div class="product_info">
                       <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[현재 수량]</span> {{ item.pAmount }}
                     </div>
 
 
@@ -119,7 +119,8 @@
                         </div>
                       </div>
 
-                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?" md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소" @md-confirm="delete_menu(get_now_name())" />
+                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?" md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소"
+                      @md-confirm="delete_menu(get_now_name())" />
                       <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)" style="font-weight: bold;">메뉴 삭제</md-button>
 
                     </div>
@@ -278,11 +279,6 @@ export default {
                 }
               }
 
-              var tot_num = 0;
-
-              for (var i = 0; i < this.temp_length; i++) {
-                tot_num += parseInt(this.temp_arr_amount[i]);
-              }
 
               axios({
                   method: 'POST',
@@ -294,7 +290,6 @@ export default {
                   data: {
                     'doc': {
                       'pDetail': JSON.parse(this.user_detail),
-                      'pAmount': tot_num,
                     }
                   }
                 })
@@ -436,7 +431,6 @@ export default {
                 data: {
                   'doc': {
                     'pDetail': JSON.parse(this.temp_string),
-                    'pAmount': (original_amount + parseInt(this.user_amount)),
                   }
                 }
               })
@@ -569,7 +563,6 @@ export default {
             "pBarcode": this.new_pBarcode,
             "pDetail": JSON.parse(temp_json),
             "pCost": this.new_pCost,
-            "pAmount": this.new_pAmount,
             "pStore": this.storeName,
           }
         })
