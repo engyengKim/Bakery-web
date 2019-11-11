@@ -20,20 +20,33 @@
               <div class="flex book-content" key="item._id">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <span style="font-weight: bold;">날짜: {{ item.rDate }}</span>
+                    <div style="font-weight: bold; margin-bottom:10px;">날짜: {{ item.rDate }}</div>
 
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[고객 이름]</span> {{ item.rBuyer }} <br>
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[구매 금액]</span> {{ item.rPrice }}
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[구매 수단]</span> 현금: {{ item.rType.cash }}
-                      <span style="margin-left:3px;">베이커리 코인: {{ item.rType.coin }}</span>
+                    <table>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; width:150px;">[고객 이름]</td>
+                        <td style="width: 150px;">{{item.rBuyer}}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; width:150px;">[구매 금액]</td>
+                        <td style="width: 150px;">{{ item.rPrice }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #425DC6; font-weight:bold; width:150px;">[구매 수단]</td>
+                        <td style="width:80px; font-weight:bold;">현금</td>
+                        <td style="width:150px;">{{ item.rType.cash }}</td>
+                        <td style="width:150px; font-weight:bold;">베이커리 코인</td>
+                        <td style="width:150px;">{{ item.rType.coin }}</td>
+                      </tr>
+                    </table>
 
-                      <div style="margin-top: 5px; margin-bottom: 5px;">
+                    <div style="margin-top:10px; margin-bottom:10px;">
+                      <div>
                         <md-button class="md-primary md-dense" style="font-weight:bold;" @click="show_rDetail(item._id)">구매내역 확인</md-button>
-                        <div id="detail_lists" v-if="(get_now_id() == item._id)"></div>
+                        <table id="detail_lists" style="width: 300px;" v-if="(get_now_id() == item._id)"></table>
                       </div>
-
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -116,14 +129,17 @@ export default {
 
           temp_length = response.data.docs[0]._source.rDetail.length;
 
+          html = '<table><tr><td style="font-weight: bold;">제품명</td><td style="font-weight:bold;">수량</td></tr>';
+
           for (var i = 0; i < temp_length; i++) {
-            html += "<div>"
-            html += ' 제품명: ';
+            html += '<tr><td>';
             html += (response.data.docs[0]._source.rDetail[i].rName);
-            html += ' | 수량: ';
+            html += '</td><td>';
             html += (response.data.docs[0]._source.rDetail[i].rAmount);
-            html += "</div>"
+            html += '</td></tr>';
           }
+          html += '</table>';
+
           document.getElementById("detail_lists").innerHTML = html;
 
         }).catch((e) => {
@@ -183,5 +199,14 @@ export default {
   justify-content: center;
   transition: all ease 0.2s;
   overflow: hidden;
+}
+
+table {
+  width: 700px;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #666666;
 }
 </style>

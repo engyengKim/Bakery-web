@@ -33,11 +33,11 @@
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-dense md-accent md-raised" @click="showDialog = true" style="margin-left:10px;">비밀번호 변경</md-button>
+              <button class="btn btn-danger btn-sm" @click="showDialog = true" style="margin-left:10px;">비밀번호 변경</button>
             </span>
 
         </span><br>
-        매니저 계좌번호: <span class="user_info">{{ this.user_bankinfo }}</span>
+        <div style="margin-top:10px;">매니저 계좌번호: <span class="user_info">{{ this.user_bankinfo }}</span></div>
         <div class="crack" />
 
         <h6 style="margin-top: 30px; margin-bottom:10px;">[가게 정보]</h6>
@@ -64,7 +64,7 @@
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-dense md-accent md-raised" @click="showDialog_1 = true" style="margin-left:10px;">이름 변경</md-button>
+              <button class="btn btn-danger btn-sm" @click="showDialog_1 = true" style="margin-left:10px;">이름 변경</button>
             </span>
 
         </span>
@@ -88,7 +88,7 @@
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-dense md-accent md-raised" @click="showDialog_2 = true" style="margin-left:10px;">주소 변경</md-button>
+              <button class="btn btn-danger btn-sm" @click="showDialog_2 = true" style="margin-left:10px;">주소 변경</button>
             </span>
 
 
@@ -136,7 +136,7 @@ export default {
 
     };
   },
-  
+
   created() {
 
     console.log("type:"+this.$session.type)

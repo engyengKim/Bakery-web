@@ -33,7 +33,7 @@
                 </md-dialog-actions>
               </md-dialog>
 
-              <md-button class="md-dense md-accent md-raised" @click="showDialog = true" style="margin-left: 20px;">비밀번호 변경</md-button>
+              <button class="btn btn-danger btn-sm" @click="showDialog = true" style="margin-left: 20px;">비밀번호 변경</button>
             </span>
         </span>
 

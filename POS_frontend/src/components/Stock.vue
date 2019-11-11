@@ -13,10 +13,9 @@
       <div id="app">
         <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
           <div class="filters-container">
-            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품"
-            :defaultQuery="this.defaultQuery" />
+            <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택하세요" selectAllLabel="모든 제품" :defaultQuery="this.defaultQuery" />
 
-            <div style="font-weight:bold; margin-left:auto; margin-right:auto;">오늘 날짜: {{ this.today }} </div>
+            <div style="font-weight:bold; margin-left:auto; margin-right:auto;">[오늘] {{ this.today }} </div>
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
 
             <div style="margin-left:auto; margin-right:auto;">
@@ -73,8 +72,7 @@
             </div>
 
           </div>
-          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false"
-          :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item.pName">
                 <div class="flex column justify-center ml20">
@@ -88,7 +86,7 @@
 
 
                     <md-button class="md-primary md-dense" style="font-weight:bold;" @click="show_pDetail(item._id, item.pName)">수량/유통기한 확인</md-button>
-                    <div id="detail_lists" v-if="(get_now_name() == item.pName)"></div>
+                    <table id="detail_lists" style="width:500px;" v-if="(get_now_name() == item.pName)"></table>
 
                   </div>
 
@@ -184,8 +182,8 @@ export default {
     };
   },
 
-  created(){
-    if(this.$session.get('type') != 'Manager' && this.$session.exists()){
+  created() {
+    if (this.$session.get('type') != 'Manager' && this.$session.exists()) {
       this.$session.destroy()
       alert("매니저 계정으로 로그인 해주세요")
       this.$router.replace('/')
@@ -227,7 +225,7 @@ export default {
       this.user_detail = '';
       this.temp_string = '';
 
-      if(this.what_change == 1) {
+      if (this.what_change == 1) {
         axios({
             method: 'POST',
             url: baseurl + '/bakery_product/_mget',
@@ -282,7 +280,7 @@ export default {
 
               var tot_num = 0;
 
-              for (var i = 0; i < this.temp_length; i++){
+              for (var i = 0; i < this.temp_length; i++) {
                 tot_num += parseInt(this.temp_arr_amount[i]);
               }
 
@@ -404,7 +402,7 @@ export default {
           })
       }
 
-      if(this.user_amount >= 0 && this.what_change == 3) {
+      if (this.user_amount >= 0 && this.what_change == 3) {
         axios({
             method: 'POST',
             url: baseurl + '/bakery_product/_mget',
@@ -549,11 +547,11 @@ export default {
 
     add_menu() {
       // create 'amount'-'expire date' json object
-      var temp_json = '[ { "pAmount" : "';
+      var temp_json = '[{ "pAmount" : "';
       temp_json += this.new_pAmount;
       temp_json += '", "pExpirationDate" : "';
       temp_json += this.new_pExpire;
-      temp_json += '"}]';
+      temp_json += '" }]';
 
       // post
       axios({
@@ -592,7 +590,7 @@ export default {
       this.temp_length = 0;
       this.temp_arr_date = [];
       this.temp_arr_amount = [];
-      var html = ''
+      var html = '';
 
       axios({
           method: 'POST',
@@ -612,14 +610,73 @@ export default {
 
           this.temp_length = response.data.docs[0]._source.pDetail.length;
 
-          for (var i = 0; i < this.temp_length; i++) {
-            html += "<div>"
-            html += '수량: ';
-            html += (response.data.docs[0]._source.pDetail[i].pAmount);
-            html += ' 유통기한: ';
-            html += (response.data.docs[0]._source.pDetail[i].pExpirationDate);
-            html += "</div>"
+          // sort by pExpirationDate
+          var data = response.data.docs[0]._source.pDetail;
+
+          function date_sort(a, b) {
+            var dateA = new Date(a["pExpirationDate"]).getTime();
+            var dateB = new Date(b["pExpirationDate"]).getTime();
+            return dateA > dateB ? 1 : -1;
           }
+
+          data.sort(date_sort);
+
+          this.temp_length = data.length;
+
+          // display oprtions about Expiration date
+          var temp_expire = [];
+          var temp_amount = [];
+          var parts = this.today.split('-');
+          var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
+          var red_point = [];
+
+          var minutes = 1000 * 60;
+          var hours = minutes * 60;
+          var three_days = hours * 24 * 3;
+
+          for (var i = 0; i < data.length; i++) {
+            var part = (data[i].pExpirationDate).split('-');
+            part = new Date(part[0], part[1] - 1, part[2]);
+
+            if (part.getTime() >= mydate.getTime()) {
+              // 유통기한 유효함
+              temp_expire.push(data[i].pExpirationDate);
+              temp_amount.push(data[i].pAmount);
+              red_point.push(0);
+
+              if (part.getTime() - mydate.getTime() <= three_days) {
+                // 유통기한 임박, red point
+                var temp_index = temp_expire.length - 1;
+                red_point[temp_index] = 1;
+              }
+
+            } else {
+              // 유통기한 지남
+              continue;
+            }
+          }
+
+          console.log(temp_expire);
+
+          html = '<table><tr><td style="font-weight:bold;">수량</td><td style="font-weight:bold;">유통기한</td></tr>';
+
+          for (var i = 0; i < temp_expire.length; i++) {
+            if (red_point[i] == 1) {
+              html += '<tr><td style="color: red;">';
+              html += (temp_amount[i]);
+              html += '</td><td style="color: red;">';
+              html += (temp_expire[i]);
+              html += '</td></tr>';
+            } else {
+              html += '<tr><td>';
+              html += (temp_amount[i]);
+              html += '</td><td>';
+              html += (temp_expire[i]);
+              html += '</td></tr>';
+            }
+          }
+          html += '</table>';
+
           document.getElementById("detail_lists").innerHTML = html;
 
         }).catch((e) => {

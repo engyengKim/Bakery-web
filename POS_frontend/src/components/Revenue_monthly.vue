@@ -65,7 +65,7 @@
                     </span>
 
 
-                    <table class="product_info" style="margin-top:10px; margin-bottom:12px;">
+                    <table class="product_info" style="margin-top:10px; margin-bottom:12px; width:500px;">
                       <tr>
                         <td style="font-weight:bold; margin-left:10px;">[현금 보유량]</td>
                         <td> {{ item.cashAmount }}</td>
