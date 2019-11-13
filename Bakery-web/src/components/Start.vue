@@ -2,10 +2,12 @@
 <div class="container-start">
   <div class="container">
     <div class="text-field">
-      <h5 id="theme" style="color:red;">시작화면</h5>
+      <h2 id="theme">Bakery web</h2>
 
-      <button v-on:click="login()">로그인</button>
-      <button v-on:click="signup()">등록</button>
+      <h4>환영합니다</h4>
+
+      <md-button type="button" class="md-accent md-raised" v-on:click="login()">로그인</md-button>
+      <md-button class="md-raised md-primary" style="background-color:#59BE84" v-on:click="signup()">등록</md-button>
 
     </div>
   </div>
@@ -47,6 +49,7 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
+@import 'bootstrap.css';
 
 .container {
   padding-left: 0px;
