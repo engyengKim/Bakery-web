@@ -60,7 +60,7 @@
 
                 <md-dialog-actions>
                   <md-button class="md-primary" @click="showDialog_1 = false">취소</md-button>
-                  <md-button class="md-primary" @click="change_store_name()">변경</md-button>
+                  <md-button class="md-primary" @click="change_store_name()">변경 요청</md-button>
                 </md-dialog-actions>
               </md-dialog>
 
@@ -84,7 +84,7 @@
 
                 <md-dialog-actions>
                   <md-button class="md-primary" @click="showDialog_2 = false">취소</md-button>
-                  <md-button class="md-primary" @click="change_store_location()">변경</md-button>
+                  <md-button class="md-primary" @click="change_store_location()">변경 요청</md-button>
                 </md-dialog-actions>
               </md-dialog>
 
