@@ -2,11 +2,10 @@
 <div class="container" id="login-container">
 
   <div id="login">
-    <h3 class="text-center text-white pt-5">Welcome to Bakery Web!</h3>
     <div class="container">
       <div id="login-row" class="row justify-content-center align-items-center">
         <div id="login-column" class="col-md-6">
-          <div id="login-box" class="col-md-12" style="height: auto;">
+          <div id="login-box" class="col-md-12" style="height:auto; margin-top:50px; margin-bottom:50px;">
 
               <h3 class="text-center text-info">회원 가입</h3>
                 <div class="form-group">
@@ -43,6 +42,7 @@
 
               <div class="form-group">
                 <button class="btn btn-success" v-on:click="register">가입 하기</button>
+                <md-button class="md-accent" style="font-weight:bold;" v-on:click="goto_home()">이전 페이지</md-button>
               </div>
 
           </div>
@@ -72,6 +72,9 @@ export default {
     }
   },
   methods: {
+    goto_home(){
+      this.$router.replace('/')
+    },
     duplicate_check(){
 
       if(this.check_result = ''){
@@ -172,19 +175,12 @@ export default {
 #theme {
   padding-top: 60px;
 }
-body {
-  font-family: "Lato", sans-serif;
-}
+
 .main-head {
   height: 150px;
   background: #FFF;
 }
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #17a2b8;
-  height: 100vh;
-}
+
 #login .container #login-row #login-column #login-box {
   max-width: 600px;
   height: 320px;

@@ -7,7 +7,7 @@
       <div id="login-row" class="row justify-content-center align-items-center">
         <div id="login-column" class="col-md-6">
           <div id="login-box" class="col-md-12" style="height: 402px;">
-            <form id="login-form" class="form" @submit.prevent="loginFunction">
+            <form id="login-form" class="form" @submit.prevent="loginFunction" style="height:420px;">
               <h3 class="text-center text-info">로그인</h3>
 
               <div class="form-group">
@@ -21,11 +21,10 @@
 
               <div class="form-group">
                 <button class="btn btn-success">로그인</button>
-                <div id="register-link" class="text-right">
-                  <p>Don't have an account?</p>
-                  <button v-on:click="goto_signup()" class="text-info">등록 정보</button>
-                  <div style="margin-bottom: 10px;" />
-                  <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
+                <div id="register-link" class="text-right" style="margin-top:10px;">
+                  <p>회원가입을 안하셨나요?</p>
+                  <md-button class="md-accent" style="font-weight:bold; font-align:right;" v-on:click="gotoHome()">이전 페이지</md-button>
+                  <md-button v-on:click="goto_signup()" class="md-raised md-primary">등록하기</md-button>
                 </div>
               </div>
 
@@ -34,44 +33,6 @@
         </div>
       </div>
     </div>
-     <footer class="footer">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-md-4">
-          <span class="copyright">Copyright &copy; KimAJo</span>
-        </div>
-        <div class="col-md-4">
-          <ul class="list-inline social-buttons">
-            <li class="list-inline-item">
-              <a href="#">
-                <i class="fab fa-twitter"></i>
-              </a>
-            </li>
-            <li class="list-inline-item">
-              <a href="#">
-                <i class="fab fa-facebook-f"></i>
-              </a>
-            </li>
-            <li class="list-inline-item">
-              <a href="#">
-                <i class="fab fa-linkedin-in"></i>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="col-md-4">
-          <ul class="list-inline quicklinks">
-            <li class="list-inline-item">
-              <a href="#">Privacy Policy</a>
-            </li>
-            <li class="list-inline-item">
-              <a href="#">Terms of Use</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer>
   </div>
 
 </div>
@@ -174,7 +135,7 @@ body {
 }
 #login .container #login-row #login-column #login-box {
   max-width: 600px;
-  height: 320px;
+  height: 420px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }
@@ -183,5 +144,9 @@ body {
 }
 #login-container {
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+#login-box{
+  padding-bottom: 20px;
 }
 </style>

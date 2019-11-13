@@ -2,14 +2,17 @@
 <div class="container-start">
   <div class="container">
     <div class="text-field">
-      <h5 id="theme" style="color:red;">홈페이지</h5>
+      <h3 id="theme">홈페이지</h3>
 
       <div class="welcome">
         환영합니다! {{this.uName}}님!
       </div>
 
-      <button v-on:click="goto_store()">매장 찾기</button>
-      <button v-on:click="goto_mypage()">마이페이지</button>
+      <div class="btn-lists">
+        <md-button class="md-raised" style="background-color:#EBB344;" v-on:click="goto_store()">매장 찾기</md-button>
+        <md-button class="md-raised" style="background-color:#EBB344;" v-on:click="goto_mypage()">마이페이지</md-button><br>
+        <md-button class="md-accent" v-on:click="logout()" style="font-weight:bold; margin-top:5px;">로그아웃</md-button>
+      </div>
 
     </div>
   </div>
@@ -43,6 +46,12 @@ export default {
     goto_mypage(){
       this.$router.replace('/mypage');
     },
+    logout(){
+      this.$session.destroy();
+      alert("로그아웃 되셨습니다.");
+      this.$router.replace('/');
+    },
+
 
   }
 }
@@ -52,6 +61,7 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
+@import 'bootstrap.css';
 
 .container {
   padding-left: 0px;

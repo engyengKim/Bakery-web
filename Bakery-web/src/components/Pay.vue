@@ -1,20 +1,20 @@
 <template>
 <div class="container-start">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a id="nav_home" class="navbar-brand" v-on:click="goto_home()">Bakery Web</a>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a id="nav_home" class="navbar-brand" style="color:white;" v-on:click="goto_home()">Bakery Web</a>
   </nav>
 
   <div class="container">
     <div class="text-field">
-      <h5 id="theme" style="color:red;">결제 및 예약하기</h5>
+      <h4 id="theme" style="font-weight:bold;">결제 및 예약하기</h4>
 
-      <div class="welcome">
-        {{this.uName}}님
+      <div class="welcome" style="margin-top:10px; margin-bottom: 30px;">
+        환영합니다. {{this.uName}}님
       </div>
 
-      <div>
-        <h4>장바구니 목록</h4>
-        <button v-on:click="show_cart()">장바구니 불러오기</button>
+      <div style="margin-bottom:20px;">
+        <h5>장바구니 목록</h5>
+        <md-button v-if="is_clicked() == false" class="md-dense md-raised" style="background-color:#44DC72;" v-on:click="show_cart()">장바구니 불러오기</md-button>
       </div>
       <table id="cart_lists_2" style="width:200px;"></table>
 
@@ -36,6 +36,7 @@ export default {
     return {
       uName: '',
       cart_array: null,
+      is_click: false,
 
     };
   },
@@ -63,8 +64,14 @@ export default {
     goto_home() {
       this.$router.replace('/home');
     },
+    is_clicked(){
+      return(this.is_click);
+    },
+
     show_cart() {
-      var html = '<table><tr><td style="font-weight:bold">제품명</td><td style="font-weight:bold;">수량</td></tr>';
+      this.is_click = true;
+
+      var html = '<table><tr><td style="font-weight:bold; color:#4463DC;">제품명</td><td style="font-weight:bold; color:#4463DC;">수량</td></tr>';
       for (var i = 0; i < this.cart_array.length; i++) {
         html += '<tr><td>';
         html += this.cart_array[i].pName;
@@ -85,6 +92,7 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
+@import 'bootstrap.css';
 
 .container {
   padding-left: 0px;
