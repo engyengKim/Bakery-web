@@ -14,7 +14,7 @@
         <div class="crack" />
         관리자 이메일: <span class="user_info">{{ this.admin_email }}</span>
         <div class="crack" />
-        관리자 비밀번호: <span class="user_info">{{ this.admin_pwd }}</span>
+          <span style="color:gray; font-weight:bold;">비밀번호를 변경하시겠습니까?</span>
         <span>
           <span>
               <md-dialog :md-active.sync="showDialog">
@@ -22,6 +22,7 @@
 
                 <md-tabs md-dynamic-height>
                   <md-tab md-label="비밀번호 변경">
+                    <input type="orgin_pwd" v-model="origin_pwd" class="form-control" placeholder="기존 비밀번호">
                     <input type="pwd" v-model="pwd" class="form-control" placeholder="새 비밀번호">
                     <input type="pwd_trial" v-model="pwd_trial" class="form-control" placeholder="새 비밀번호 재입력">
                   </md-tab>
@@ -62,6 +63,7 @@ export default {
       showDialog: false,
       pwd: null,
       pwd_trial: null,
+      origin_pwd: null,
 
       admin_name: null,
       admin_email: null,
@@ -114,35 +116,40 @@ export default {
     },
 
     change_pwd() {
-      if(this.pwd == this.pwd_trial){
+      if(this.origin_pwd == this.admin_pwd){
+        if(this.pwd == this.pwd_trial){
 
-        // axios POST
-        axios({
-            method: 'POST',
-            url: baseurl + '/bakery_admin/_doc/' + this.uid + '/_update',
-            headers: {
-              Authorization: 'Basic S0IzSFZ4R2dIOmU5YjRkYzU4LTM1MjgtNDZiMi1hZDU3LTA5MDVjMzRmNjU2NA==',
-              'Content-Type': 'application/json'
-            },
-            data: {
-              'doc': {
-                'password': this.pwd,
+          // axios POST
+          axios({
+              method: 'POST',
+              url: baseurl + '/bakery_admin/_doc/' + this.uid + '/_update',
+              headers: {
+                Authorization: 'Basic S0IzSFZ4R2dIOmU5YjRkYzU4LTM1MjgtNDZiMi1hZDU3LTA5MDVjMzRmNjU2NA==',
+                'Content-Type': 'application/json'
+              },
+              data: {
+                'doc': {
+                  'password': this.pwd,
+                }
               }
-            }
-          })
-          .then((response) => {
-            //var hits_length = response.data.hits.hits.length
-            console.log(response);
-            alert("변경되었습니다");
-            window.history.go(0);
-          }).catch((e) => {
-            console.log(e.response)
-          })
+            })
+            .then((response) => {
+              //var hits_length = response.data.hits.hits.length
+              console.log(response);
+              alert("변경되었습니다");
+              window.history.go(0);
+            }).catch((e) => {
+              console.log(e.response)
+            })
 
-        this.showDialog = false;
+          this.showDialog = false;
+        }else{
+          alert("새로운 비밀번호가 일치하지 않습니다!");
+        }
       }else{
-        alert("비밀번호가 일치하지 않습니다!");
+        alert("현재 비밀번호를 잘못 입력하셨습니다!");
       }
+
 
     },
 

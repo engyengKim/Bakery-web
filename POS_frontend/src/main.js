@@ -11,6 +11,7 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 import VueSession from 'vue-session'
+import VueBarcodeScanner from 'vue-barcode-scanner'
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
@@ -20,6 +21,7 @@ Vue.use(ReactiveSearch)
 Vue.use(VueMaterial)
 Vue.use(MdContent)
 Vue.use(VueSession)
+Vue.use(VueBarcodeScanner)
 
 /* eslint-disable no-new */
 new Vue({

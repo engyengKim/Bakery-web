@@ -19,7 +19,7 @@
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
 
             <div style="margin-left:auto; margin-right:auto;">
-              <md-dialog :md-active.sync="showDialog">
+              <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction"> <!-- openDialogFunction 추가 !! -->
                 <md-dialog-title>메뉴 추가하기</md-dialog-title>
 
                 <md-tabs md-dynamic-height>
@@ -50,7 +50,7 @@
                         <span style="font-weight: bold;">가격</span>
                         <input type="new_pPrice" v-model="new_pPrice" class="form-control" placeholder="가격">
                         <span style="font-weight: bold;">바코드</span>
-                        <input type="text" v-model="new_pBarcode" class="form-control" placeholder="바코드 번호">
+                        <input type="text" v-model="new_pBarcode" class="form-control" placeholder="바코드 번호" readonly>
                       </div>
                     </div>
 
@@ -146,6 +146,18 @@ import 'vue-material/dist/vue-material.min.css'
 import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
 
+
+function leadingZero(n, digits){ // 바코드 생성때 필요한 함수
+    var zero = '';
+    n = n.toString();
+
+    if (n.length < digits) {
+        for (var i = 0; i < digits - n.length; i++)
+        zero += '0';
+    }
+    return zero + n;
+}
+
 export default {
   name: 'Stock',
   data() {
@@ -208,6 +220,55 @@ export default {
           }
         }
       }
+    },
+
+    openDialogFunction(){ //*****추가버튼 누르면 팝업창 뜰때 작동되는 트리거 함수 (여기서 자동으로 바코드 번호 생성함)
+    //manager_code 따로 해야할지? barcode 입력 받는 부분은 readonly 로 설정해놓고 값만 볼수있게 수정함. line 53
+      axios({
+          method: 'GET',
+          url : baseurl+'/bakery_product'+'/_search?q=**',
+          headers: {
+              Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg=='
+          }
+      }).then((response) => {
+          console.log(response);
+          this.result = response.data;
+          var national_code = '880'
+          var manager_code = '1111'
+
+          var length = response.data.hits.hits.length + 1
+
+          var barcode = national_code+manager_code+leadingZero(length, 5)
+
+          var split = barcode.split("");
+
+          var evenSum = 0;
+          var oddSum = 0;
+
+            for(var i in split){
+              if(i % 2 == 1){
+                  evenSum += (split[i]*1)
+              }
+              else{
+                  oddSum += (split[i]*1)
+              }
+            }
+
+          var checksum = (10 - (oddSum + 3*evenSum) % 10) % 10;
+
+          barcode += checksum
+
+          this.new_pBarcode = barcode;
+          console.log(split);
+          console.log(evenSum+",,,,"+oddSum);
+          console.log(barcode)
+          // 3자리 + 4자리 + 5자리 + 체크섬1자리 = 13자리 바코드
+
+
+
+      }).catch((ex)=> {
+          console.log("ERR!!!!! : ", ex)
+      })
     },
 
     goto_home() {
@@ -555,6 +616,7 @@ export default {
             Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
             'Content-Type': 'application/json'
           },
+
           data: {
             "pName": this.new_pName,
             "pPrice": this.new_pPrice,
@@ -564,6 +626,7 @@ export default {
             "pDetail": JSON.parse(temp_json),
             "pCost": this.new_pCost,
             "pStore": this.storeName,
+            "pManagerID": this.$session.get("uId") //*****물품 추가시 매니저 아이디가 빠져서 제대로 업데이트가 안되서 추가함
           }
         })
         .then((response) => {
