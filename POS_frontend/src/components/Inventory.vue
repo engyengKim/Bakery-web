@@ -12,11 +12,7 @@
         <md-tabs md-sync-route>
           <md-tab id="tab-home" md-label="재고 관리" to="/Stock" exact>
             <div class="crack">[재고 관리]에서는 제품의 수량과 가격을 변경하고, 새로운 메뉴를 추가하거나 기존 메뉴를 삭제할 수 있습니다.</div>
-            <div class="crack">[폐기 제품 관리]에서는 유통기한이 지난 제품들을 확인하고 관리할 수 있습니다.</div>
             <div class="crack">[제품 관리 내역]에서는 제품 관리 내역을 확인할 수 있습니다.</div>
-          </md-tab>
-
-          <md-tab id="tab-favoirtes" md-label="폐기 제품 관리" to="/Expire">
           </md-tab>
 
           <md-tab id="tab-favorites" md-label="제품 관리 내역" to="/History">

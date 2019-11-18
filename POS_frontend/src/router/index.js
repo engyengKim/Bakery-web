@@ -8,7 +8,6 @@ import Start from '@/components/Start'
 import Login from '@/components/Login'
 import Revenue from '@/components/Revenue'
 import Inventory from '@/components/Inventory'
-import Expire from '@/components/Expire'
 import History from '@/components/History'
 import MyPage from '@/components/MyPage'
 import Admin_Home from '@/components/Admin_Home'
@@ -65,11 +64,6 @@ export default new Router({
       path: '/history',
       name: 'History',
       component: History
-    },
-    {
-      path: '/expire',
-      name: 'Expire',
-      component: Expire
     },
     {
       path: '/my_page',
