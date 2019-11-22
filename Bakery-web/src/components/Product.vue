@@ -31,7 +31,7 @@
                       <tr>
                         <td style="color: #4463DC;">[가격]</td>
                         <td>{{ item.pPrice }}</td>
-                        <td style="color:blue;"><button class="btn btn-sm" style="font-weight:bold; color:red;" v-on:click="get_amount(item._id)">매장수량?</button></td>
+                        <td style="color:blue;"><button class="btn btn-sm" style="font-weight:bold; color:red;" v-on:click="get_amount(item._id)">매장수량 확인</button></td>
                         <td id="amount_place" v-if="(get_now_id()==item._id) && (get_click_type() == 1)"></td>
                       </tr>
                     </table>
@@ -65,12 +65,7 @@
             </div>
 
             <div style="margin-top:20px;">
-              <table style="width:200px; color:blue;">
-                <tr>
-                  <td style="padding-left:30px; font-weight:bold;">제품명</td>
-                  <td style="padding-left:40px; font-weight:bold;">수량</td>
-                </tr>
-              </table>
+              <div v-if="this.cart_name.length == 0">장바구니가 비어있습니다.</div>
               <table id="cart_lists" style="width:200px;"></table>
             </div>
 
@@ -185,7 +180,7 @@ export default {
 
         var html = '';
 
-        html += '<table>';
+        html += '<table><tr><td style="font-weight:bold; color:blue;">제품명</td><td style="font-weight:bold; color:blue;">수량</td></tr>';
 
         for (var i = 0; i < this.cart_name.length; i++) {
           html += '<tr><td>';
@@ -206,7 +201,7 @@ export default {
     cart_reset() {
       this.cart_name = [];
       this.cart_amount = [];
-      document.getElementById("cart_lists").innerHTML = '비어있습니다';
+      document.getElementById("cart_lists").innerHTML = '';
     },
 
     delete_cart(name) {
