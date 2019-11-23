@@ -58,6 +58,19 @@
 import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io/bakery_customer'
 var currentUserId = ''
+
+function leadingZero(n, digits){ // 바코드 생성때 필요한 함수
+    var zero = '';
+    n = n.toString();
+
+    if (n.length < digits) {
+        for (var i = 0; i < digits - n.length; i++)
+        zero += '0';
+    }
+    return zero + n;
+}
+
+
 export default {
   name: 'Signup',
   data() {
@@ -124,33 +137,72 @@ export default {
       }
       else{
         // 회원가입
-      axios({
-          method: 'POST',
-          url: baseurl + '/_doc/',
+        axios({
+          method: 'GET',
+          url : baseurl+'/_search?q=**',
           headers: {
-            Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA==',
-            'Content-Type': 'application/json'
-          },
-          data: {
-            "email": this.uEmail,
-            "password": this.uPassword,
-            "name": this.uName,
-            "address": this.uAddress,
-            "contact": this.uContact,
-            "bakeryCoin": 0,
-            "barcode": "",
+              Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA=='
           }
+      }).then((response) => {
+
+          var national_code = '880'
+          var manager_code = '0000'
+
+          var length = response.data.hits.hits.length
+
+          var barcode = national_code+manager_code+leadingZero(length, 5)
+
+          var split = barcode.split("");
+
+          var evenSum = 0;
+          var oddSum = 0;
+
+            for(var i in split){
+              if(i % 2 == 1){
+                  evenSum += (split[i]*1)
+              }
+              else{
+                  oddSum += (split[i]*1)
+              }
+            }
+
+          var checksum = (10 - (oddSum + 3*evenSum) % 10) % 10;
+
+          barcode += checksum
+
+          axios({
+            method: 'POST',
+            url: baseurl + '/_doc/',
+            headers: {
+              Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              "email": this.uEmail,
+              "password": this.uPassword,
+              "name": this.uName,
+              "address": this.uAddress,
+              "contact": this.uContact,
+              "bakeryCoin": 0,
+              "barcode": barcode,
+            }
+          })
+          .then((response) => {
+
+            console.log(response);
+            this.$session.destroy();
+            alert("회원 가입이 완료 되었습니다!\n로그인 해 주세요.");
+
+            this.$router.replace('/login')
+          }).catch((e) => {
+            console.log(e.response)
+          })
+
+
+        }).catch((ex)=> {
+            console.log("ERR!!!!! : ", ex)
         })
-        .then((response) => {
-          //var hits_length = response.data.hits.hits.length
-          console.log(response);
-          this.$session.destroy();
-          alert("회원 가입이 완료 되었습니다!\n로그인 해 주세요.");
-          this.showDialog = false;
-          this.$router.push('/login')
-        }).catch((e) => {
-          console.log(e.response)
-        })
+
       }
     },
     gotoHome() {

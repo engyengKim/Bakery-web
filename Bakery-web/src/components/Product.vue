@@ -24,9 +24,11 @@
             :pagination="true" :from="0" :size="3" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
+                  <img :src="item.pImg" alt="Image" class="book-image" />
                   <div class="flex column justify-center ml20">
 
                     <div style="font-weight:bold; margin-bottom:10px;">{{ item.pName }}</div>
+                    <div style="color:gray; font-size:smaller;">{{item.pDescription}}</div>
                     <table style="margin-bottom:5px; width:300px;">
                       <tr>
                         <td style="color: #4463DC;">[가격]</td>
@@ -349,6 +351,7 @@ export default {
 .products {
   width: auto;
   right: 0;
+  margin-left: 30px;
   overflow-y: scroll;
   height: 65vh;
   display: grid;
