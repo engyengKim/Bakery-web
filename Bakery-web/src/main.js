@@ -13,6 +13,9 @@ import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 
+//import VueBarcode from '@chenfengyuan/vue-barcode'
+//import 'expose-loader?$!expose-loader?jQuery!jquery'
+
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
@@ -22,6 +25,8 @@ Vue.use(VueSession)
 
 Vue.use(VueMaterial)
 Vue.use(MdContent)
+
+//Vue.component(VueBarcode.name, VueBarcode);
 
 /* eslint-disable no-new */
 new Vue({
