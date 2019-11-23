@@ -18,8 +18,8 @@
           </p>
 
           <div class="btn-lists">
-            <md-button class="md-raised" style="background-color:#EBB344;" v-on:click="goto_store()">매장 찾기</md-button>
-            <md-button class="md-raised" style="background-color:#EBB344;" v-on:click="goto_mypage()">마이페이지</md-button><br>
+            <button class="btn btn-warning" v-on:click="goto_store()">매장 찾기</button>
+            <button class="btn btn-warning" v-on:click="goto_mypage()">마이페이지</button><br>
             <md-button class="md-accent" v-on:click="logout()" style="font-weight:bold; margin-top:5px;">로그아웃</md-button>
           </div>
         </div>

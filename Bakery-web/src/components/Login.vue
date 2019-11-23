@@ -78,13 +78,16 @@ export default {
                if(response.data.hits.max_score != null){
                    currentUserId = response.data.hits.hits[0]._id
                    var currentUserName = response.data.hits.hits[0]._source.name
+                   var currentUserBarcode = response.data.hits.hits[0]._source.barcode
                    this.$session.set('mangerId', '')
                    this.$session.set('cart_array', '')
                    this.$session.set('uId', currentUserId)
                    this.$session.set('uName', currentUserName)
+                   this.$session.set('uBarcode', currentUserBarcode)
                    console.log("CONFIRM!")
                    console.log("Current User ID is :"+currentUserId)
                    alert('어서오세요! '+currentUserName+'님')
+
                    this.$router.push('/home')
                }
                else{
