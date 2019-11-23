@@ -10,34 +10,37 @@
       <div>
         <reactive-base app="bakery_advancedorder" credentials="hkzwIw1Em:b402ce56-9b61-4021-997c-9b857379401b">
 
-          <reactive-list componentId="SearchResult" dataField="aoVisitDate" sortBy="asc" :showResultStats="false" :pagination="true" :from="0" :size="5"
-          :defaultQuery="this.defaultQuery">
+          <reactive-list componentId="SearchResult" dataField="aoVisitDate" sortBy="asc" :showResultStats="false" :pagination="true" :from="0" :size="5" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }" class="order-list">
-              <div class="flex book-content" key="item._id">
+              <div class="flex book-content" key="item._id" style="width:900px;">
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
-                    <table style="width:500px;">
-                      <tr>
-                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[고객 ID]</td>
-                        <td>{{ item.aoCustomer_id }}</td>
-                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[방문 날짜]</td>
-                        <td>{{ item.aoVisitDate }}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[제품]</td>
-                        <td>{{ item.aoProduct }}</td>
-                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[수량]</td>
-                        <td>{{ item.aoAmount }}</td>
-                      </tr>
-                      <tr>
-                        <td style="color: #425DC6; font-weight:bold; margin-left:10px;">[요구사항]</td>
-                        <td>{{ item.aoRequestContent }}</td>
-                      </tr>
+                    <table class="table table-hover" style="width:500px;">
+                      <thead>
+                        <tr>
+                          <th scope="col">고객 이름</th>
+                          <th scope="col">방문 날짜</th>
+                          <th scope="col"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">{{item.aoCustomer_name}}</th>
+                          <td>{{item.aoVisitDate}}</td>
+                          <td rowspan="2">
+                            <button type="button" class="btn btn-danger btn-sm" v-on:click="deal_complete(item._id)">
+                              처리 완료
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
                     </table>
 
-                    <md-button class="md-accent md-raised md-dense" v-on:click="deal_complete(item._id)" style="margin-left:3px; margin-top:10px; margin-bottom:10px;">
-                      처리 완료
-                    </md-button>
+                    <div style="margin-bottom:10px;">
+                      <md-button class="md-dense" style="color:green; font-weight:bold;" v-on:click="detail_clicked(item._id)">제품 목록 확인</md-button>
+                      <table id="aoDetail" style="width:300px; background-color:#E6E5D9; border-radius: 10px;" v-if="(get_now_id() == item._id)"></table>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -63,7 +66,9 @@ const baseurl = 'https://scalr.api.appbase.io'
 export default {
   name: 'Order',
   data() {
-    return {}
+    return {
+      now_id: '',
+    }
   },
 
   created() {
@@ -89,33 +94,78 @@ export default {
       }
     },
 
-    deal_complete(id) {
-      // axios: update 'aoResult' to "완료"
+    detail_clicked(id) {
+      this.now_id = id;
+
+      // axios
       axios({
           method: 'POST',
-          url: baseurl + '/bakery_advancedorder/_doc/' + id + '/_update',
+          url: baseurl + '/bakery_advancedorder/_mget',
           headers: {
             Authorization: 'Basic aGt6d0l3MUVtOmI0MDJjZTU2LTliNjEtNDAyMS05OTdjLTliODU3Mzc5NDAxYg==',
             'Content-Type': 'application/json'
           },
           data: {
-            'doc': {
-              'aoResult': '완료',
-            }
+            "docs": [{
+              "_id": id,
+            }, ]
           }
         })
         .then((response) => {
           console.log(response);
-          alert("처리되었습니다");
+          var detail = response.data.docs[0]._source.aoDetail;
 
-          // update record DB
+          var html = '<table><tr><td style="font-weight:bold; padding:5px;">제품명</td><td style="font-weight:bold; padding:5px;">수량</td></tr>';
+          for (var i = 0; i < detail.length; i++) {
+            html += '<tr><td style="padding:5px;">';
+            html += detail[i].aoProduct;
+            html += '</td><td style="padding:5px;">';
+            html += detail[i].aoAmount;
+            html += '</td></tr>';
+          }
+          html += '</table>';
 
+          console.log(html);
+          console.log(document.getElementById("aoDetail"));
 
-          window.history.go(0);
+          document.getElementById("aoDetail").innerHTML = html;
+
         }).catch((e) => {
           console.log(e.response)
         })
 
+    },
+
+    get_now_id() {
+      return (this.now_id);
+    },
+
+    deal_complete(id) {
+      // axios: update 'aoResult' to "완료"
+      var is_complete = confirm("거래를 완료하시겠습니까?");
+      if (is_complete) {
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_advancedorder/_doc/' + id + '/_update',
+            headers: {
+              Authorization: 'Basic aGt6d0l3MUVtOmI0MDJjZTU2LTliNjEtNDAyMS05OTdjLTliODU3Mzc5NDAxYg==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              'doc': {
+                'aoResult': '완료',
+              }
+            }
+          })
+          .then((response) => {
+            console.log(response);
+            alert("거래 완료되었습니다.");
+            window.history.go(0);
+
+          }).catch((e) => {
+            console.log(e.response)
+          })
+      }
     },
 
   }

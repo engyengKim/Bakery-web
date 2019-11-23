@@ -21,7 +21,7 @@
             </div>
 
             <reactive-list componentId="SearchResult" dataField="_id"  class="products" :showResultStats="false"
-            :pagination="true" :from="0" :size="3" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
+            :pagination="true" :from="0" :size="3" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery" style="margin-left:100px;">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <img :src="item.pImg" alt="Image" class="book-image" />
@@ -43,7 +43,7 @@
                         <button type="button" class="btn btn-warning btn-sm" v-on:click="cart_clicked(item._id)">카트 추가</button>
                         <div class="input-group-append" style="margin-left:5px;" v-if="(get_now_id()==item._id) && (get_click_type() == 2)">
                           <input type="number" v-model="user_amount" placeholder="수량" style="width:50px;">
-                          <button type="button" class="btn" v-on:click="add_cart(item._id, item.pName)">추가</button>
+                          <button type="button" class="btn" v-on:click="add_cart(item._id, item.pName, item.pPrice)">추가</button>
                         </div>
                       </div>
                       <button type="button" class="btn btn-sm btn-danger" v-on:click="delete_cart(item.pName)">카트 삭제</button>
@@ -64,6 +64,10 @@
             <div>
               <md-button class="md-raised md-dense md-accent" v-on:click="cart_reset()">비우기</md-button>
               <md-button class="md-raised md-dense" style="background-color:#44DC72;" v-on:click="goto_pay()">예약하기</md-button>
+            </div>
+
+            <div style="margin-top:5px; font-weight:bold;">
+              현재 금액: {{this.tot_price}}원
             </div>
 
             <div style="margin-top:20px;">
@@ -99,8 +103,11 @@ export default {
       user_amount: null,
       cart_name: [],
       cart_amount: [],
+      cart_price: [],
       now_tot_amount: 0,
       click_type: 0,
+
+      tot_price: 0,
     };
   },
 
@@ -160,7 +167,7 @@ export default {
       return(this.click_type);
     },
 
-    add_cart(id, name) {
+    add_cart(id, name, price) {
 
       if (this.user_amount <= 0) {
         alert("양수를 입력해주세요!");
@@ -171,6 +178,7 @@ export default {
           // newly add
           this.cart_name.push(name);
           this.cart_amount.push(this.user_amount);
+          this.cart_price.push(price);
           alert("추가되었습니다");
         } else {
           // change amount
@@ -183,6 +191,7 @@ export default {
         var html = '';
 
         html += '<table><tr><td style="font-weight:bold; color:blue;">제품명</td><td style="font-weight:bold; color:blue;">수량</td></tr>';
+        var temp_price = 0;
 
         for (var i = 0; i < this.cart_name.length; i++) {
           html += '<tr><td>';
@@ -190,12 +199,15 @@ export default {
           html += '</td><td>';
           html += this.cart_amount[i];
           html += '</td></tr>';
+
+          // get tot_price
+          temp_price += (this.cart_price[i]*this.cart_amount[i]);
         }
 
         html += '</table>';
 
         document.getElementById("cart_lists").innerHTML = html;
-
+        this.tot_price = temp_price;
       }
 
     },
@@ -203,6 +215,8 @@ export default {
     cart_reset() {
       this.cart_name = [];
       this.cart_amount = [];
+      this.cart_price = [];
+      this.tot_price = 0;
       document.getElementById("cart_lists").innerHTML = '';
     },
 
@@ -215,9 +229,11 @@ export default {
       } else {
         this.cart_name.splice(i, 1);
         this.cart_amount.splice(i, 1);
+        this.cart_price.splice(i, 1);
 
         // update cart
         var html = '';
+        var temp_price = 0;
 
         if (this.cart_name.length == 0) {
           html = '비어있습니다';
@@ -230,12 +246,16 @@ export default {
             html += '</td><td>';
             html += this.cart_amount[i];
             html += '</td></tr>';
+
+            // get tot_price
+            temp_price += (this.cart_price[i]*this.cart_amount[i]);
           }
 
           html += '</table>';
         }
 
         document.getElementById("cart_lists").innerHTML = html;
+        this.tot_price = temp_price;
       }
     },
 
@@ -249,6 +269,8 @@ export default {
           arr += this.cart_name[i];
           arr += '", "pAmount" : "';
           arr += this.cart_amount[i];
+          arr += '", "pPrice" : "';
+          arr += this.cart_price[i];
 
           if (i != (this.cart_name.length - 1)) {
             arr += '" },';
@@ -259,6 +281,7 @@ export default {
 
         var arr_final = JSON.parse(arr);
         this.$session.set('cart_array', arr_final);
+        this.$session.set('cart_price', this.tot_price);
 
         this.$router.replace('/pay');
       } else {
@@ -369,7 +392,7 @@ export default {
   margin-left:10px;
   margin-right:50px;
   margin-top: 140px;
-  top: 0;
+  top: 100px;
   scroll-behavior: smooth;
   justify-content: center;
   transition: all ease 0.2s;

@@ -84,6 +84,7 @@ export default {
                    this.$session.set('uId', currentUserId)
                    this.$session.set('uName', currentUserName)
                    this.$session.set('uBarcode', currentUserBarcode)
+                   this.$session.set('cart_price', '')
                    console.log("CONFIRM!")
                    console.log("Current User ID is :"+currentUserId)
                    alert('어서오세요! '+currentUserName+'님')

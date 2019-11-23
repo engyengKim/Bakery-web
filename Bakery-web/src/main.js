@@ -22,7 +22,6 @@ Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 Vue.use(ReactiveSearch)
 Vue.use(VueSession)
-
 Vue.use(VueMaterial)
 Vue.use(MdContent)
 

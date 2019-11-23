@@ -66,7 +66,7 @@
                       <input type="text" v-model="new_pImg" class="form-control" placeholder="이미지 절대경로">
                     </div>
                   </md-tab>
-                  
+
                 </md-tabs>
 
                 <md-dialog-actions>
