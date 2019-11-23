@@ -376,7 +376,4 @@ export default {
   overflow: hidden;
 }
 
-td {
-  border: 1px solid #666666;
-}
 </style>
