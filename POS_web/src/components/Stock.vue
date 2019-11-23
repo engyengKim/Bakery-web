@@ -19,11 +19,11 @@
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
 
             <div style="margin-left:auto; margin-right:auto;">
-              <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction"> <!-- openDialogFunction 추가 !! -->
+              <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction" style="height:800px;"> <!-- openDialogFunction 추가 !! -->
                 <md-dialog-title>메뉴 추가하기</md-dialog-title>
 
                 <md-tabs md-dynamic-height>
-                  <md-tab md-label="새 메뉴 정보">
+                  <md-tab md-label="기본 정보">
                     <div class="form-group">
                       <div class="input-group mb-3">
                         <span style="font-weight: bold;">이름</span>
@@ -58,8 +58,15 @@
                       <span style="font-weight: bold;">설명</span>
                       <input type="text" v-model="new_pDescript" class="form-control" placeholder="설명">
                     </div>
-
                   </md-tab>
+
+                  <md-tab md-label="이미지 정보">
+                    <div class="form-group">
+                      <span style="font-weight: bold;">이미지 절대경로</span>
+                      <input type="text" v-model="new_pImg" class="form-control" placeholder="이미지 절대경로">
+                    </div>
+                  </md-tab>
+                  
                 </md-tabs>
 
                 <md-dialog-actions>
@@ -76,6 +83,7 @@
           :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item.pName">
+                <img :src="item.pImg" alt="Image" class="book-image" />
                 <div class="flex column justify-center ml20">
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
@@ -181,6 +189,7 @@ export default {
       new_pBarcode: '',
       new_pCost: null,
       new_pDescript: '',
+      new_pImg: '',
 
       temp_length: 0,
       temp_arr_amount: [],
@@ -626,6 +635,7 @@ export default {
             "pDetail": JSON.parse(temp_json),
             "pCost": this.new_pCost,
             "pStore": this.storeName,
+            "pImg": this.new_pImg,
             "pManagerID": this.$session.get("uId") //*****물품 추가시 매니저 아이디가 빠져서 제대로 업데이트가 안되서 추가함
           }
         })

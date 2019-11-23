@@ -21,10 +21,7 @@
               <div class="form-group">
                 <button class="btn btn-success">로그인</button>
                 <div id="register-link" class="text-right">
-                  <p>Bakery-web 매니저 계정이 없으신가요?</p>
-                  <a href="#" class="text-info">등록 정보</a>
-                  <div style="margin-bottom: 10px;" />
-                  <md-button class="md-accent" v-on:click="gotoHome()">이전 페이지</md-button>
+                  <md-button class="md-accent" style="font-weight:bold;" v-on:click="gotoHome()">이전 페이지</md-button>
                 </div>
               </div>
 

@@ -28,7 +28,7 @@
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
-                    <md-button v-on:click='get_name(item.pName, item.pPrice, item._id)'>{{ item.pName }}</md-button>
+                    <md-button v-on:click='get_name(item.pName, item.pPrice, item._id, item.pImg)'>{{ item.pName }}</md-button>
                     <span>
                       <font style="color:gray;">{{item.pPrice}}</font>
                     </span>
@@ -122,6 +122,32 @@ function numberFormat(inputNumber) { // 정규식으로 숫자 천 단위로 콤
    return inputNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function getTimeStamp() {
+  var d = new Date();
+  var s =
+    leadingZeros(d.getFullYear(), 4) + '-' +
+    leadingZeros(d.getMonth() + 1, 2) + '-' +
+    leadingZeros(d.getDate(), 2) + ' ' +
+
+    leadingZeros(d.getHours(), 2) + ':' +
+    leadingZeros(d.getMinutes(), 2) + ':' +
+    leadingZeros(d.getSeconds(), 2);
+
+  return s;
+}
+
+function leadingZeros(n, digits) {
+  var zero = '';
+  n = n.toString();
+
+  if (n.length < digits) {
+    for (var i = 0; i < digits - n.length; i++)
+      zero += '0';
+  }
+  return zero + n;
+}
+
+
 export default {
   name: 'Payment',
   data() {
@@ -131,6 +157,7 @@ export default {
       product_amount: [],
       product_price: [],
       product_id: [],
+      product_img: [],
 
       now_product_name: '',
       is_clicked: false,
@@ -193,9 +220,13 @@ export default {
         console.log(e.response)
       })
 
-    var currentDate = new Date();
-    var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-    this.buying_date = currentDateWithFormat;
+    //var currentDate = new Date();
+
+    //var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+    //this.buying_date = currentDateWithFormat;
+    this.buying_date = getTimeStamp();
+
+    //alert(this.buying_date);
 
   },
   destroyed() {
@@ -217,8 +248,8 @@ export default {
     check_coin(){
       if(this.user_barcode == null){
          //test용 테스트시 alert 부분 주석처리하고 이거 사용할것
-        //this.user_barcode = "8801111000000"
-        alert("바코드를 입력해주세요.")
+        this.user_barcode = "8800000000015"
+        //alert("바코드를 입력해주세요.")
       }
 
       if(payWindow == true && this.user_barcode != null){
@@ -294,14 +325,17 @@ export default {
             console.log(response);
             var pName = ''
             var pPrice = ''
+            var pImg = ''
             pName = response.data.hits.hits[0]._source.pName
             pPrice = response.data.hits.hits[0]._source.pPrice
+            pImg = response.data.hits.hits[0]._source.pImg
 
             if (this.product_list.includes(pName)) {
               alert("이미 목록에 존재하는 상품입니다.")
             } else {
               this.product_list.push(pName)
               this.product_amount.push(1)
+              this.product_img.push(pImg)
               this.sum += parseInt(pPrice)
             }
 
@@ -322,7 +356,7 @@ export default {
         })
       }
     },
-    get_name(name, price, id) {
+    get_name(name, price, id, image) {
       this.product_name = name
 
       if (this.product_list.includes(name)) {
@@ -331,6 +365,7 @@ export default {
         this.product_list.push(name)
         this.product_amount.push(1)
         this.product_id.push(id)
+        this.product_img.push(image)
 
         this.sum += parseInt(price)
       }
@@ -351,6 +386,7 @@ export default {
       this.product_list = []
       this.product_amount = []
       this.product_id = []
+      this.product_img = []
       this.sum = 0
       this.tot_price = 0
       document.getElementById("lists").innerHTML = this.product_list
@@ -365,6 +401,7 @@ export default {
         this.product_list.splice(a, 1);
         this.product_amount.splice(a, 1);
         this.product_id.splice(a, 1);
+        this.product_img.splice(a, 1);
 
         this.sum -= temp;
 
@@ -434,7 +471,7 @@ export default {
           this.user_name = '익명';
         }
 
-        // set rDetail: rAmount, rName
+        // set rDetail: rAmount, rName, rImg
         var user_detail = '[';
         var length = this.product_list.length;
 
@@ -443,6 +480,8 @@ export default {
           user_detail += this.product_amount[i];
           user_detail += '", "rName" : "';
           user_detail += this.product_list[i];
+          user_detail += '", "rImg" : "';
+          user_detail += this.product_img[i];
           if (i != length - 1) {
             user_detail += '" },';
           } else {
@@ -555,18 +594,21 @@ export default {
     },
 
     close_pay() {
-      this.remain = null;
-      this.user_money = null;
-      this.card_number = null;
       this.showDialog = false;
-      this.tot_price = 0;
 
-      this.product_list = [];
-      this.product_amount = [];
-      this.product_price = [];
-      this.product_id = [];
+      // this.remain = null;
+      // this.user_money = null;
+      // this.card_number = null;
+      // this.tot_price = 0;
+      // this.sum = 0;
+      //
+      // this.product_list = [];
+      // this.product_amount = [];
+      // this.product_price = [];
+      // this.product_id = [];
+      //
+      // document.getElementById("lists").innerHTML = this.product_list;
 
-      document.getElementById("lists").innerHTML = this.product_list
     },
 
   }
