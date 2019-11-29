@@ -15,13 +15,11 @@
       <div class="grid-container" style="margin-top:20px;">
         <div id="app">
           <reactive-base app="bakery_product" class="base" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
-            <div class="filters-container">
-              <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택" selectAllLabel="모두"
-              :defaultQuery="this.defaultQuery" />
+            <div class="search-filter">
+              <multi-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리를 선택" selectAllLabel="모두" :defaultQuery="this.defaultQuery" />
             </div>
 
-            <reactive-list componentId="SearchResult" dataField="_id"  class="products" :showResultStats="false"
-            :pagination="true" :from="0" :size="3" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery" style="margin-left:100px;">
+            <reactive-list componentId="SearchResult" dataField="_id" class="products" :showResultStats="false" :pagination="true" :from="0" :size="3" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <img :src="item.pImg" alt="Image" class="book-image" />
@@ -108,12 +106,16 @@ export default {
       click_type: 0,
 
       tot_price: 0,
+      today: null,
     };
   },
 
   created() {
-    this.manager_id = this.$session.get('managerId');
+    var currentDate = new Date();
+    var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+    this.today = currentDateWithFormat;
 
+    this.manager_id = this.$session.get('managerId');
     axios({
         method: 'POST',
         url: baseurl + '/bakery_manager/_mget',
@@ -134,6 +136,7 @@ export default {
       }).catch((e) => {
         console.log(e.response)
       })
+
   },
 
   methods: {
@@ -163,8 +166,8 @@ export default {
       return (this.now_id);
     },
 
-    get_click_type(){
-      return(this.click_type);
+    get_click_type() {
+      return (this.click_type);
     },
 
     add_cart(id, name, price) {
@@ -201,7 +204,7 @@ export default {
           html += '</td></tr>';
 
           // get tot_price
-          temp_price += (this.cart_price[i]*this.cart_amount[i]);
+          temp_price += (this.cart_price[i] * this.cart_amount[i]);
         }
 
         html += '</table>';
@@ -248,7 +251,7 @@ export default {
             html += '</td></tr>';
 
             // get tot_price
-            temp_price += (this.cart_price[i]*this.cart_amount[i]);
+            temp_price += (this.cart_price[i] * this.cart_amount[i]);
           }
 
           html += '</table>';
@@ -289,7 +292,7 @@ export default {
       }
     },
 
-    get_amount(id){
+    get_amount(id) {
       this.click_type = 1;
       this.now_id = id;
 
@@ -312,7 +315,20 @@ export default {
           var detail = response.data.docs[0]._source.pDetail;
           var tot = 0;
 
-          for(var i=0; i<detail.length; i++){
+          // do not count if expirationDate is over
+          var part;
+
+          var parts = this.today.split('-');
+          var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
+
+          for (var i = 0; i < detail.length; i++) {
+            part = (detail[i].pExpirationDate).split('-');
+            part = new Date(part[0], part[1] - 1, part[2]);
+
+            if (part.getTime() < mydate.getTime()) {
+              continue;
+            }
+
             tot += parseInt(detail[i].pAmount);
           }
 
@@ -341,12 +357,13 @@ export default {
   grid-template-areas:
     'app'
     'cart';
+  grid-gap: 50px;
 }
 
-.base{
+.base {
   display: grid;
   grid-template-areas:
-  'filters-container products products';
+    'search-filter products products';
 }
 
 .container {
@@ -372,9 +389,7 @@ export default {
 }
 
 .products {
-  width: auto;
   right: 0;
-  margin-left: 30px;
   overflow-y: scroll;
   height: 65vh;
   display: grid;
@@ -384,15 +399,11 @@ export default {
   transition: all ease 0.2s;
 }
 
-.filters-container {
-  width: 20%;
+.search-filter {
   display: grid;
-  grid-area:filters-container;
+  grid-area: search-filter;
   flex-direction: column;
-  margin-left:10px;
-  margin-right:50px;
-  margin-top: 140px;
-  top: 100px;
+
   scroll-behavior: smooth;
   justify-content: center;
   transition: all ease 0.2s;
@@ -410,6 +421,8 @@ export default {
 #app {
   display: grid;
   grid-area: app;
-  right:0;
+  right: 0;
+  grid-template-areas:
+    'base';
 }
 </style>
