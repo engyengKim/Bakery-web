@@ -349,6 +349,7 @@ export default {
                 }
               }
 
+              console.log(this.user_detail);
 
               axios({
                   method: 'POST',
@@ -467,7 +468,7 @@ export default {
           })
       }
 
-      if (this.user_amount >= 0 && this.what_change == 3) {
+      if (this.user_amount > 0 && this.what_change == 3) {
         axios({
             method: 'POST',
             url: baseurl + '/bakery_product/_mget',
@@ -543,6 +544,8 @@ export default {
           }).catch((e) => {
             console.log(e.response)
           })
+      }else if (this.user_amount <= 0 && this.what_change == 3){
+        alert("양수를 입력해주세요");
       }
     },
 
