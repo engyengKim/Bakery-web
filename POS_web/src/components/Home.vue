@@ -8,7 +8,7 @@
 
           <p id="description" class="lead">
             <font color="black">
-              <h3>안녕하세요, 매장 매니저님</h3>
+              <h3>안녕하세요, <span style="color:#2783C6;">{{this.manager_name}}</span>님</h3>
               저희는 매장 매니저님의 운영/판매 작업을 위하여<br>
               다음 4가지의 시스템을 제공하고 있습니다<br><br>
               당신의 완벽한 비지니스 파트너가 되도록 노력하겠습니다<br>
@@ -42,7 +42,9 @@
 export default {
   name: 'Home',
   data() {
-    return {}
+    return {
+      manager_name: '',
+    }
   },
   created(){
     if(this.$session.get('type') != 'Manager'){
@@ -50,6 +52,8 @@ export default {
       alert("매니저 계정으로 로그인 해주세요")
       this.$router.replace('/')
     }
+
+    this.manager_name = this.$session.get('manager_name')
   },
   methods: {
     goto_order() {

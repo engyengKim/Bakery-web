@@ -6,7 +6,7 @@
     <div class="container">
       <div id="login-row" class="row justify-content-center align-items-center">
         <div id="login-column" class="col-md-6">
-          <div id="login-box" class="col-md-12" style="height: 402px;">
+          <div id="login-box" class="col-md-12" style="height: 420px;">
             <form id="login-form" class="form" @submit.prevent="loginFunction">
               <h3 class="text-center text-info">로그인</h3>
               <div class="form-group">
@@ -23,6 +23,12 @@
                 <div id="register-link" class="text-right">
                   <md-button class="md-accent" style="font-weight:bold;" v-on:click="gotoHome()">이전 페이지</md-button>
                 </div>
+
+                <div style="text-align:right">
+                  <md-button class="md-dense" v-on:click="ask_help()">매니저 계정을 잊어버리셨나요?</md-button>
+                  <div id="help" style="font-size:small; color:blue;"></div>
+                </div>
+
               </div>
 
             </form>
@@ -45,13 +51,37 @@ export default {
   data() {
     return {
       'uEmail': '',
-      'uPassword': ''
+      'uPassword': '',
+      admin_email: '',
     }
   },
   created() {
     if(this.$session.get('type') == 'Manager'){
       this.$router.replace('/home')
     }
+
+    // get admin contact
+    axios({
+        method: 'POST',
+        url: 'https://scalr.api.appbase.io/bakery_admin/_mget',
+        headers: {
+          Authorization: 'Basic ak55SHdjYXBtOmU2NmJkMjFlLWYxYzUtNDNjMS04NjkxLTI0MThmYTg2YzNjZA==',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          "docs": [{
+            "_id": 'sK5KIm4BvBPhFQgpKRNe',
+          }, ]
+        }
+      })
+      .then((response) => {
+        console.log(response);
+        this.admin_email = response.data.docs[0]._source.email;
+
+      }).catch((e) => {
+        console.log(e.response)
+      })
+
   },
   methods: {
     loginFunction: function(){
@@ -83,6 +113,7 @@ export default {
                    this.$session.set('uId', currentUserId)
                    this.$session.set('type', currentUserType)
                    this.$session.set('storeName', currentStoreName)
+                   this.$session.set('manager_name', currentUserName)
                    console.log("CONFIRM!")
                    console.log("Current User ID is :"+currentUserId)
                    alert('어서오세요! '+currentUserName+'님')
@@ -104,6 +135,15 @@ export default {
 
     gotoHome() {
       this.$router.replace('/')
+    },
+
+    ask_help() {
+      // show admin contact
+      var html = '';
+      html += 'Admin 연락처는 <span style="font-weight:bold;">';
+      html += this.admin_email;
+      html += '</span>입니다. <br>이곳으로 연락해보세요.';
+      document.getElementById("help").innerHTML = html;
     },
   }
 }
@@ -132,8 +172,6 @@ body {
   font-family: "Lato", sans-serif;
 }
 
-
-
 .main-head {
   height: 150px;
   background: #FFF;
@@ -149,7 +187,7 @@ body {
 
 #login .container #login-row #login-column #login-box {
   max-width: 600px;
-  height: 320px;
+  height: 420px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }

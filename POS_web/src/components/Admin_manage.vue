@@ -38,6 +38,7 @@
                     <table>
                       <tr>
                         <td style="font-weight: bold;">{{ item.name }}</td>
+                        <td><button class="btn btn-danger btn-sm" v-on:click="delete_manager(item._id)">탈퇴시키기</button></td>
                       </tr>
 
                       <tr>
@@ -260,7 +261,7 @@ export default {
             html += '<td>'+manager_name+'</td>'
             html += '<td>'+'매장 명 변경</td>'
             html += '<td>'+name_before+' → '+name_after+'</td>'
-            html += '<td><button class="btn btn-outline-info" name="nameChangeButton" value="'+value+'" id="'+request_id+'">승 인</button></td>'
+            html += '<td><button name="nameChangeButton" value="'+value+'" id="'+request_id+'">승 인</button></td>'
             html += '</tr>'
           }
           else if(isConfirm == false && type == "location"){ // 매장 주소 변경 승인시
@@ -270,7 +271,7 @@ export default {
             html += '<td>'+manager_name+'</td>'
             html += '<td>'+'매장 주소 변경</td>'
             html += '<td>'+location_before+' → '+location_after+'</td>'
-            html += '<td><button class="btn btn-outline-info" name="LocationChangeButton" value="'+value+'" id="'+request_id+'">승 인</button></td>'
+            html += '<td><button name="LocationChangeButton" value="'+value+'" id="'+request_id+'">승 인</button></td>'
             html += '</tr>'
           }
         }
@@ -329,9 +330,36 @@ export default {
   methods: {
     goto_home() {
       this.$router.replace('/admin_home')
-    }
+    },
 
-
+    delete_manager(id){
+      var is_confirm = confirm("매니저를 탈퇴시키겠습니까?");
+      if(is_confirm){
+        axios({
+            method: 'POST',
+            url: baseurl + '/bakery_manager/_delete_by_query',
+            headers: {
+              Authorization: 'Basic eXVkeG5LSXFGOmM4NWFiNGE0LWQ0ZTktNDJjNC1iMDdkLTMzMTMwYTU1MzRhMw==',
+              'Content-Type': 'application/json'
+            },
+            data: {
+              "query": {
+                "match": {
+                  "_id": id
+                }
+              }
+            }
+          })
+          .then((response) => {
+            //var hits_length = response.data.hits.hits.length
+            console.log(response);
+            alert("탈퇴 처리되었습니다.");
+            window.history.go(0);
+          }).catch((e) => {
+            console.log(e.response)
+          })
+      }
+    },
   }
 }
 </script>

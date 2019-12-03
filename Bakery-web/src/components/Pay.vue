@@ -234,6 +234,9 @@ export default {
           temp_arr += this.cart_array[i].pAmount;
           temp_arr += '", "aoProduct" : "';
           temp_arr += this.cart_array[i].pName;
+          temp_arr += '", "aoImg" : "';
+          temp_arr += this.cart_array[i].pImg;
+
           if (i != this.cart_array.length - 1) {
             temp_arr += '" },';
           } else {
@@ -241,7 +244,7 @@ export default {
           }
         }
 
-        alert(temp_arr);
+        console.log(temp_arr);
 
         // axios write Advance Order
         axios({
@@ -261,6 +264,7 @@ export default {
               "aoResult": "대기중",
               "aoVisitDate": this.new_visitDate,
               "aoCustomer_name": this.uName,
+              "aoPrice": this.tot_price,
             }
           })
           .then((response) => {
