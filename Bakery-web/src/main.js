@@ -15,6 +15,7 @@ import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
 
 import VueBarcode from '@chenfengyuan/vue-barcode'
 import 'expose-loader?$!expose-loader?jQuery!jquery'
+import Hooper from 'hooper'
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false

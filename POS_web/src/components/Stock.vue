@@ -19,7 +19,8 @@
             <md-button class="md-dense" v-on:click="goto_Inventory()">이전 페이지</md-button>
 
             <div style="margin-left:auto; margin-right:auto;">
-              <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction" style="height:800px;"> <!-- openDialogFunction 추가 !! -->
+              <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction" style="height:800px;">
+                <!-- openDialogFunction 추가 !! -->
                 <md-dialog-title>메뉴 추가하기</md-dialog-title>
 
                 <md-tabs md-dynamic-height>
@@ -79,8 +80,7 @@
             </div>
 
           </div>
-          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5"
-          :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
+          <reactive-list componentId="SearchResult" dataField="pName" className="result-list-container" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
             <div slot="renderData" slot-scope="{ item }">
               <div class="flex book-content" key="item.pName">
                 <img :src="item.pImg" alt="Image" class="book-image" />
@@ -127,8 +127,7 @@
                         </div>
                       </div>
 
-                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?" md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소"
-                      @md-confirm="delete_menu(get_now_name())" />
+                      <md-dialog-confirm :md-active.sync="active" md-title="메뉴를 삭제하시겠습니까?" md-content="[확인]을 누르시면 작업을 취소할 수 없습니다." md-confirm-text="확인" md-cancel-text="취소" @md-confirm="delete_menu(get_now_name())" />
                       <md-button class="md-accent md-dense" @click="delete_clicked(item.pName)" style="font-weight: bold;">메뉴 삭제</md-button>
 
                     </div>
@@ -155,15 +154,15 @@ import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
 
 
-function leadingZero(n, digits){ // 바코드 생성때 필요한 함수
-    var zero = '';
-    n = n.toString();
+function leadingZero(n, digits) { // 바코드 생성때 필요한 함수
+  var zero = '';
+  n = n.toString();
 
-    if (n.length < digits) {
-        for (var i = 0; i < digits - n.length; i++)
-        zero += '0';
-    }
-    return zero + n;
+  if (n.length < digits) {
+    for (var i = 0; i < digits - n.length; i++)
+      zero += '0';
+  }
+  return zero + n;
 }
 
 export default {
@@ -235,25 +234,20 @@ export default {
     //manager_code 따로 해야할지? barcode 입력 받는 부분은 readonly 로 설정해놓고 값만 볼수있게 수정함. line 53
       axios({
           method: 'GET',
-          url : baseurl+'/bakery_product'+'/_search?q=**',
+          url : baseurl+'/bakery_product'+'/_count',
           headers: {
               Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg=='
           }
       }).then((response) => {
-          console.log(response);
+          //console.log(response);
           this.result = response.data;
           var national_code = '880'
           var manager_code = '1111'
-
-          var length = response.data.hits.hits.length + 1
-
+          var length = response.data.count + 1
           var barcode = national_code+manager_code+leadingZero(length, 5)
-
           var split = barcode.split("");
-
           var evenSum = 0;
           var oddSum = 0;
-
             for(var i in split){
               if(i % 2 == 1){
                   evenSum += (split[i]*1)
@@ -262,19 +256,13 @@ export default {
                   oddSum += (split[i]*1)
               }
             }
-
           var checksum = (10 - (oddSum + 3*evenSum) % 10) % 10;
-
           barcode += checksum
-
           this.new_pBarcode = barcode;
-          console.log(split);
-          console.log(evenSum+",,,,"+oddSum);
-          console.log(barcode)
+          //console.log(split);
+          //console.log(evenSum+",,,,"+oddSum);
+          //console.log(barcode)
           // 3자리 + 4자리 + 5자리 + 체크섬1자리 = 13자리 바코드
-
-
-
       }).catch((ex)=> {
           console.log("ERR!!!!! : ", ex)
       })
@@ -315,6 +303,7 @@ export default {
 
             var old_amount = null;
             this.temp_length = response.data.docs[0]._source.pDetail.length;
+            console.log(response.data.docs[0]._source.pDetail);
 
             for (var i = 0; i < this.temp_length; i++) {
               this.temp_arr_amount.push(response.data.docs[0]._source.pDetail[i].pAmount);
@@ -325,7 +314,6 @@ export default {
                 this.temp_index = i;
                 old_amount = this.temp_arr_amount[i];
                 this.temp_arr_amount[i] = this.user_amount;
-                break;
               }
             }
 
@@ -484,67 +472,82 @@ export default {
           })
           .then((response) => {
             console.log(response);
-            this.temp_string = JSON.stringify(response.data.docs[0]._source.pDetail);
-            var original_amount = response.data.docs[0]._source.pAmount;
 
-            var new_string = ', { "pAmount" : "' + this.user_amount + '", "pExpirationDate" : "' + this.user_date + '"} ]';
-            var i = this.temp_string.indexOf(']');
-            this.temp_string = this.temp_string.substring(0, i);
-            this.temp_string += new_string;
+            var temp_detail = response.data.docs[0]._source.pDetail;
+            var temp_date = [];
+            for (var i = 0; i < temp_detail.length; i++) {
+              // check if duplicate
+              temp_date.push(temp_detail[i].pExpirationDate);
+            }
+            var input_date = String(this.user_date);
+            if (temp_date.indexOf(input_date) != -1) {
 
-            axios({
-                method: 'POST',
-                url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
-                headers: {
-                  Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
-                  'Content-Type': 'application/json'
-                },
-                data: {
-                  'doc': {
-                    'pDetail': JSON.parse(this.temp_string),
-                  }
-                }
-              })
-              .then((response) => {
-                console.log(response);
+              alert("동일한 유통기한을 입력하셨습니다. [수량변경]을 이용해주세요!");
 
-                // set hContents
-                var contents = '물품 입고 | 제품명: ';
-                contents += name;
-                contents += ' | 유통기한: ';
-                contents += this.user_date;
-                contents += ' | 수량: ';
-                contents += parseInt(this.user_amount);
+            } else {
 
-                axios({
-                    method: 'POST',
-                    url: baseurl + '/bakery_history/_doc/',
-                    headers: {
-                      Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
-                      'Content-Type': 'application/json'
-                    },
-                    data: {
-                      "hContents": contents,
-                      "hDate": this.today,
-                      "hManagerID": this.uid,
+              this.temp_string = JSON.stringify(response.data.docs[0]._source.pDetail);
+              var original_amount = response.data.docs[0]._source.pAmount;
+
+              var new_string = ', { "pAmount" : "' + this.user_amount + '", "pExpirationDate" : "' + this.user_date + '"} ]';
+              var i = this.temp_string.indexOf(']');
+              this.temp_string = this.temp_string.substring(0, i);
+              this.temp_string += new_string;
+
+              axios({
+                  method: 'POST',
+                  url: baseurl + '/bakery_product/_doc/' + product_id + '/_update',
+                  headers: {
+                    Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+                    'Content-Type': 'application/json'
+                  },
+                  data: {
+                    'doc': {
+                      'pDetail': JSON.parse(this.temp_string),
                     }
-                  })
-                  .then((response) => {
-                    //var hits_length = response.data.hits.hits.length
-                    console.log(response);
-                    alert("[물품] 입고, 기록되었습니다");
-                    this.is_clicked = false;
-                    window.history.go(0);
-                  }).catch((e) => {
-                    console.log(e.response)
-                  })
-              }).catch((e) => {
-                console.log(e.response)
-              })
+                  }
+                })
+                .then((response) => {
+                  console.log(response);
+
+                  // set hContents
+                  var contents = '물품 입고 | 제품명: ';
+                  contents += name;
+                  contents += ' | 유통기한: ';
+                  contents += this.user_date;
+                  contents += ' | 수량: ';
+                  contents += parseInt(this.user_amount);
+
+                  axios({
+                      method: 'POST',
+                      url: baseurl + '/bakery_history/_doc/',
+                      headers: {
+                        Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                        'Content-Type': 'application/json'
+                      },
+                      data: {
+                        "hContents": contents,
+                        "hDate": this.today,
+                        "hManagerID": this.uid,
+                      }
+                    })
+                    .then((response) => {
+                      //var hits_length = response.data.hits.hits.length
+                      console.log(response);
+                      alert("[물품] 입고, 기록되었습니다");
+                      this.is_clicked = false;
+                      window.history.go(0);
+                    }).catch((e) => {
+                      console.log(e.response)
+                    })
+                }).catch((e) => {
+                  console.log(e.response)
+                })
+            }
           }).catch((e) => {
             console.log(e.response)
           })
-      }else if (this.user_amount <= 0 && this.what_change == 3){
+      } else if (this.user_amount <= 0 && this.what_change == 3) {
         alert("양수를 입력해주세요");
       }
     },
@@ -599,9 +602,33 @@ export default {
         .then((response) => {
           //var hits_length = response.data.hits.hits.length
           console.log(response);
-          alert("삭제되었습니다");
-          this.is_clicked = false;
-          window.history.go(0);
+
+          // set hContents
+          var contents = '메뉴 삭제 | 제품명: ';
+          contents += product_name;
+
+          axios({
+              method: 'POST',
+              url: baseurl + '/bakery_history/_doc/',
+              headers: {
+                Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                'Content-Type': 'application/json'
+              },
+              data: {
+                "hContents": contents,
+                "hDate": this.today,
+                "hManagerID": this.uid,
+              }
+            })
+            .then((response) => {
+              //var hits_length = response.data.hits.hits.length
+              console.log(response);
+              alert("메뉴 삭제되었습니다");
+              this.is_clicked = false;
+              window.history.go(0);
+            }).catch((e) => {
+              console.log(e.response)
+            })
         }).catch((e) => {
           console.log(e.response)
         })
@@ -645,9 +672,38 @@ export default {
         .then((response) => {
           //var hits_length = response.data.hits.hits.length
           console.log(response);
-          alert("추가되었습니다");
-          this.showDialog = false;
-          window.history.go(0);
+
+          // set hContents
+          var contents = '메뉴 추가 | 제품명: ';
+          contents += this.new_pName;
+          contents += ' | 유통기한: ';
+          contents += this.new_pExpire;
+          contents += ' | 수량: ';
+          contents += parseInt(this.new_pAmount);
+
+          axios({
+              method: 'POST',
+              url: baseurl + '/bakery_history/_doc/',
+              headers: {
+                Authorization: 'Basic ZWdkWDZkbWxQOjk3N2U2MjRiLTY1MTEtNGRlYy1hNDY2LTJhZTIzZGQzM2FiNg==',
+                'Content-Type': 'application/json'
+              },
+              data: {
+                "hContents": contents,
+                "hDate": this.today,
+                "hManagerID": this.uid,
+              }
+            })
+            .then((response) => {
+              //var hits_length = response.data.hits.hits.length
+              console.log(response);
+              alert("메뉴 추가되었습니다");
+              this.showDialog = false;
+              window.history.go(0);
+
+            }).catch((e) => {
+              console.log(e.response)
+            })
         }).catch((e) => {
           console.log(e.response)
         })
@@ -793,7 +849,6 @@ export default {
   top: 0;
   scroll-behavior: smooth;
   justify-content: center;
-  transition: all ease 0.2s;
   overflow: hidden;
 }
 

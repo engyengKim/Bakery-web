@@ -19,12 +19,10 @@
         <div class="item2">
           <reactive-base app="bakery_product" credentials="rucxxdjm3:7d5fd3b6-f237-4c31-ad2b-5ab5ff3b3ae2">
             <div class="item5">
-              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false"
-              :showCount="false" :defaultQuery="this.defaultQuery" />
+              <single-list componentId="Category" dataField="pCategory.keyword" class="filter" title="카테고리 선택" selectAllLabel="모두" :showSearch="false" :showCount="false" :defaultQuery="this.defaultQuery" />
             </div>
 
-            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :showResultStats="false" :pagination="true" :from="0" :size="5"
-            :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
+            <reactive-list componentId="SearchResult" dataField="pName" className="item6" :showResultStats="false" :pagination="true" :from="0" :size="5" :react="{and: ['Category']}" :defaultQuery="this.defaultQuery">
               <div slot="renderData" slot-scope="{ item }">
                 <div class="flex book-content" key="item._id">
                   <div class="fSlex column justify-center ml20">
@@ -64,7 +62,8 @@
           <h6 id="theme">거래 진행 및 취소</h6>
 
           <span>
-            <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction" @md-closed="closeDialogFunction"> <!--trigger function 추가 -->
+            <md-dialog :md-active.sync="showDialog" @md-opened="openDialogFunction" @md-closed="closeDialogFunction">
+              <!--trigger function 추가 -->
               <md-dialog-title>결제 창</md-dialog-title>
 
               <md-tabs md-dynamic-height>
@@ -119,7 +118,7 @@ const baseurl = 'https://scalr.api.appbase.io'
 var payWindow = false;
 
 function numberFormat(inputNumber) { // 정규식으로 숫자 천 단위로 콤마찍기
-   return inputNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return inputNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function getTimeStamp() {
@@ -147,6 +146,10 @@ function leadingZeros(n, digits) {
   return zero + n;
 }
 
+function test(){
+  alert("test");
+}
+
 
 export default {
   name: 'Payment',
@@ -164,7 +167,7 @@ export default {
       active: false,
       showDialog: false,
       tot_price: 0,
-      sum:0,
+      sum: 0,
       remain: null,
       ok_pressed: false,
       gift_number: null,
@@ -230,75 +233,73 @@ export default {
 
   },
   destroyed() {
-      this.$barcodeScanner.destroy()
+    this.$barcodeScanner.destroy()
   },
   methods: {
     goto_home() {
       this.$router.replace('/home')
     },
-    openDialogFunction(){
+    openDialogFunction() {
       payWindow = true;
       this.tot_price = this.sum
 
     },
-    closeDialogFunction(){
+    closeDialogFunction() {
       payWindow = false;
 
     },
-    check_coin(){
-      if(this.user_barcode == null){
-         //test용 테스트시 alert 부분 주석처리하고 이거 사용할것
+    check_coin() {
+      if (this.user_barcode == null) {
+        //test용 테스트시 alert 부분 주석처리하고 이거 사용할것
         this.user_barcode = "8800000000015"
         //alert("바코드를 입력해주세요.")
       }
 
-      if(payWindow == true && this.user_barcode != null){
+      if (payWindow == true && this.user_barcode != null) {
 
         axios({
-            method: 'POST',
-            url : baseurl+'/bakery_customer/_search',
-            headers: {
-                Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA==',
-                'Content-Type': 'application/json'
-            },
-            data: {
-                  'query':{
-                      'match_phrase':{
-                          'barcode': this.user_barcode
-                      }
-                  }
-               }
+          method: 'POST',
+          url: baseurl + '/bakery_customer/_search',
+          headers: {
+            Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA==',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            'query': {
+              'match_phrase': {
+                'barcode': this.user_barcode
+              }
+            }
+          }
         }).then((response) => {
-            console.log(response);
+          console.log(response);
 
-            if(response.data.hits.hits.legnth != 0 ){
+          if (response.data.hits.hits.legnth != 0) {
 
-              var data = response.data.hits.hits[0]._source
-              var coin = data.bakeryCoin
-              this.user_name = data.name
-              this.user_id = response.data.hits.hits[0]._id
+            var data = response.data.hits.hits[0]._source
+            var coin = data.bakeryCoin
+            this.user_name = data.name
+            this.user_id = response.data.hits.hits[0]._id
 
-              if(this.tot_price <= coin){
-                this.user_remain_coin = coin*1 - this.tot_price*1
-                alert("결제 가능합니다.\n현재 Bakery Coin 잔액 : "+numberFormat(coin)+"원\n결제 후 Bakery Coin 잔액 : "+numberFormat(this.user_remain_coin)+"원")
-                this.user_bakeryCoin = this.tot_price
-                document.getElementById("payButton").disabled = false
-                this.ok_pressed = true
-              }
-              else{
-                alert("잔액이 부족합니다.\n현재 Bakery Coin 잔액 : "+numberFormat(coin)+"원")
-              }
+            if (this.tot_price <= coin) {
+              this.user_remain_coin = coin * 1 - this.tot_price * 1
+              alert("결제 가능합니다.\n현재 Bakery Coin 잔액 : " + numberFormat(coin) + "원\n결제 후 Bakery Coin 잔액 : " + numberFormat(this.user_remain_coin) + "원")
+              this.user_bakeryCoin = this.tot_price
+              document.getElementById("payButton").disabled = false
+              this.ok_pressed = true
+            } else {
+              alert("잔액이 부족합니다.\n현재 Bakery Coin 잔액 : " + numberFormat(coin) + "원")
             }
-            else {
-              alert("회원 정보에 해당 바코드가 존재하지 않습니다.\n회원이 아니시거나 바코드가 잘못되었습니다.")
-            }
+          } else {
+            alert("회원 정보에 해당 바코드가 존재하지 않습니다.\n회원이 아니시거나 바코드가 잘못되었습니다.")
+          }
 
-        }).catch((ex)=> {
-            console.log("ERR!!!!! : ", ex)
+        }).catch((ex) => {
+          console.log("ERR!!!!! : ", ex)
         })
       }
     },
-    defaultQuery: function(value, props){
+    defaultQuery: function(value, props) {
       return {
         query: {
           match: {
@@ -307,52 +308,51 @@ export default {
         }
       }
     },
-    onBarcodeScanned (barcode) {
+    onBarcodeScanned(barcode) {
       console.log(barcode)
-      if(payWindow == true){ // 결제창일때 바코드 작동
+      if (payWindow == true) { // 결제창일때 바코드 작동
         document.getElementById("user_barcode").value = barcode // 바코드란 값 변경해주기
         this.user_barcode = barcode;
-      }
-      else{ //결제창 아닐때 바코드 작동
+      } else { //결제창 아닐때 바코드 작동
 
         axios({
           method: 'GET',
-          url : baseurl+'/bakery_product/_search?q=*'+barcode+'*',
+          url: baseurl + '/bakery_product/_search?q=*' + barcode + '*',
           headers: {
             Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg=='
           }
         }).then((response) => {
-            console.log(response);
-            var pName = ''
-            var pPrice = ''
-            var pImg = ''
-            pName = response.data.hits.hits[0]._source.pName
-            pPrice = response.data.hits.hits[0]._source.pPrice
-            pImg = response.data.hits.hits[0]._source.pImg
+          console.log(response);
+          var pName = ''
+          var pPrice = ''
+          var pImg = ''
+          pName = response.data.hits.hits[0]._source.pName
+          pPrice = response.data.hits.hits[0]._source.pPrice
+          pImg = response.data.hits.hits[0]._source.pImg
 
-            if (this.product_list.includes(pName)) {
-              alert("이미 목록에 존재하는 상품입니다.")
-            } else {
-              this.product_list.push(pName)
-              this.product_amount.push(1)
-              this.product_img.push(pImg)
-              this.sum += parseInt(pPrice)
-            }
+          if (this.product_list.includes(pName)) {
+            alert("이미 목록에 존재하는 상품입니다.")
+          } else {
+            this.product_list.push(pName)
+            this.product_amount.push(1)
+            this.product_img.push(pImg)
+            this.sum += parseInt(pPrice)
+          }
 
-            var html = '<table>';
-            for (var i = 0; i < this.product_list.length; i++) {
-              html += '<tr>';
-              html += '<td>' + this.product_list[i] + '</td>';
-              html += '<td>' + this.product_amount[i] + '</td>';
-              html += '</tr>';
+          var html = '<table>';
+          for (var i = 0; i < this.product_list.length; i++) {
+            html += '<tr>';
+            html += '<td>' + this.product_list[i] + '</td>';
+            html += '<td>' + this.product_amount[i] + '</td>';
+            html += '</tr>';
 
-            }
-            html += '</table>';
-            document.getElementById("lists").innerHTML = html;
+          }
+          html += '</table>';
+          document.getElementById("lists").innerHTML = html;
 
-        }).catch((ex)=> {
-            alert("바코드에 해당되는 상품이 없습니다!")
-            console.log("ERR!!!!! : ", ex)
+        }).catch((ex) => {
+          alert("바코드에 해당되는 상품이 없습니다!")
+          console.log("ERR!!!!! : ", ex)
         })
       }
     },
@@ -373,13 +373,18 @@ export default {
       var html = '<table>';
       for (var i = 0; i < this.product_list.length; i++) {
         html += '<tr>';
-        html += '<td>' + this.product_list[i] + '</td>';
+        html += '<td><button id="test-btn">' + this.product_list[i] + '</button></td>';
         html += '<td>' + this.product_amount[i] + '</td>';
         html += '</tr>';
-
       }
       html += '</table>';
+
+      console.log(this.product_list);
+
       document.getElementById("lists").innerHTML = html;
+
+
+
     },
 
     reset() {
@@ -461,11 +466,11 @@ export default {
         this.remain = null;
         this.showDialog = false;
 
-        if (this.user_money == null){
+        if (this.user_money == null) {
           // only user BakeryCoin
           this.user_money = 0;
         }
-        if (this.user_barcode == null){
+        if (this.user_barcode == null) {
           // only use CASH
           this.user_bakeryCoin = 0;
           this.user_name = '익명';
@@ -496,7 +501,7 @@ export default {
         user_type += this.user_bakeryCoin;
         user_type += '" }';
 
-        if(this.user_barcode != null && this.bakeryCoin != 0){
+        if (this.user_barcode != null && this.bakeryCoin != 0) {
           axios({
               method: 'POST',
               url: baseurl + '/bakery_customer/_doc/' + this.user_id + '/_update',
@@ -519,6 +524,8 @@ export default {
             })
         }
 
+        var today = new Date();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
         //axios POST 레코드 생성
         axios({
@@ -536,11 +543,11 @@ export default {
               "rDetail": JSON.parse(user_detail),
               "rType": JSON.parse(user_type),
               "rManagerID": this.uid,
+              "rTime": time,
             }
           })
           .then((response) => {
             console.log(response);
-            alert("record DB에 입력 완료!");
             alert("결제가 성공적으로 진행되었습니다");
             window.history.go(0);
 
@@ -643,7 +650,6 @@ export default {
 
 .item1 {
   grid-area: product_list;
-
   overflow-y: scroll;
 }
 

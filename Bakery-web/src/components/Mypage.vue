@@ -31,7 +31,7 @@
         </tbody>
       </table>
 
-      <span style="color:gray;">비밀번호를 변경하시겠습니까?</span>
+      <span style="color:gray; font-size: small; margin-left:8px;">비밀번호를 변경하시겠습니까?</span>
       <span>
         <span>
           <md-dialog :md-active.sync="showDialog">
@@ -51,10 +51,13 @@
             </md-dialog-actions>
           </md-dialog>
 
-          <button class="btn btn-danger btn-sm" @click="showDialog = true" style="margin-left:10px;">비밀번호 변경</button>
+          <md-button class="md-dense md-raised md-accent" @click="showDialog = true" style="margin-left:10px;">비밀번호 변경</md-button>
         </span>
 
       </span><br>
+
+      <md-button class="md-dense md-accent" v-on:click="delete_customer()">탈퇴하시겠습니까?</md-button><br>
+
 
       <h5 id="theme" style="margin-top:40px; font-weight:bold;">나의 베이커리 코인</h5>
       <div class="sub-container" style="margin-bottom:20px; padding:10px;">
@@ -327,6 +330,42 @@ export default {
       });
       this.showDialog_2 = false;
 
+    },
+
+    delete_customer(){
+      var is_confirm = confirm("정말 탈퇴하시겠습니까?");
+
+      if(is_confirm){
+        var user_id = this.$session.get('uId');
+
+        //axios: delete customer information
+        axios({
+          method: 'POST',
+          url: baseurl + '/bakery_customer/_delete_by_query',
+          headers: {
+            Authorization: 'Basic anhaMFFSQzdhOjhlNDhjYzhlLWUxNmUtNDNiNy1hZjUyLTkzODBkZmU1NDVhNA==',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            "query": {
+              "match": {
+                "_id": user_id
+              }
+            }
+          }
+        })
+        .then((response) => {
+          //var hits_length = response.data.hits.hits.length
+          console.log(response);
+          this.$session.destroy();
+          alert("탈퇴 되셨습니다.");
+          this.$router.replace('/');
+
+        }).catch((e) => {
+          console.log(e.response)
+        })
+
+      }
     },
 
   }
