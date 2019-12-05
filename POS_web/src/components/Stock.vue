@@ -88,9 +88,12 @@
                   <div class="inline-1">
                     <span style="font-weight: bold;">{{ item.pName }}</span>
 
-                    <div class="product_info">
-                      <span style="color: #425DC6; font-weight:bold; margin-left:10px;">[가격]</span> {{ item.pPrice }}
-                    </div>
+                    <table class="product_info" style="width:300px;">
+                      <tr>
+                        <td><span style="color: #425DC6; font-weight:bold;">[가격]</span><span style="margin-left:10px;">{{ item.pPrice }}</span></td>
+                        <td><span style="color: #425DC6; font-weight:bold;">[판매율]</span><span style="margin-left:10px;">{{ getPercentage(item.pSaleSum, item.pAmountSum) }}</span></td>
+                      </tr>
+                    </table>
 
 
                     <md-button class="md-primary md-dense" style="font-weight:bold;" @click="show_pDetail(item._id, item.pName)">수량/유통기한 확인</md-button>
@@ -230,6 +233,14 @@ export default {
       }
     },
 
+    getPercentage(saleSum, amountSum){
+      var s = (saleSum/amountSum)*100;
+      s = parseInt(s);
+      s = String(s) + '%';
+
+      return s;
+    },
+
     openDialogFunction(){ //*****추가버튼 누르면 팝업창 뜰때 작동되는 트리거 함수 (여기서 자동으로 바코드 번호 생성함)
     //manager_code 따로 해야할지? barcode 입력 받는 부분은 readonly 로 설정해놓고 값만 볼수있게 수정함. line 53
       axios({
@@ -302,6 +313,8 @@ export default {
             console.log(response);
 
             var old_amount = null;
+            var temp_amountSum = 0;
+
             this.temp_length = response.data.docs[0]._source.pDetail.length;
             console.log(response.data.docs[0]._source.pDetail);
 
@@ -315,7 +328,11 @@ export default {
                 old_amount = this.temp_arr_amount[i];
                 this.temp_arr_amount[i] = this.user_amount;
               }
+              temp_amountSum += parseInt(this.temp_arr_amount[i]);
             }
+
+            console.log('Before amountSum: ' + response.data.docs[0]._source.pAmountSum);
+            console.log('Updated amountSum: ' + temp_amountSum);
 
             if (this.is_same && this.user_amount >= 0 && this.what_change == 1) {
               // change AMOUNT
@@ -349,6 +366,7 @@ export default {
                   data: {
                     'doc': {
                       'pDetail': JSON.parse(this.user_detail),
+                      'pAmountSum': temp_amountSum,
                     }
                   }
                 })
@@ -473,19 +491,19 @@ export default {
           .then((response) => {
             console.log(response);
 
+            var temp_amountSum = response.data.docs[0]._source.pAmountSum;
             var temp_detail = response.data.docs[0]._source.pDetail;
             var temp_date = [];
+
             for (var i = 0; i < temp_detail.length; i++) {
               // check if duplicate
               temp_date.push(temp_detail[i].pExpirationDate);
             }
             var input_date = String(this.user_date);
             if (temp_date.indexOf(input_date) != -1) {
-
               alert("동일한 유통기한을 입력하셨습니다. [수량변경]을 이용해주세요!");
 
             } else {
-
               this.temp_string = JSON.stringify(response.data.docs[0]._source.pDetail);
               var original_amount = response.data.docs[0]._source.pAmount;
 
@@ -493,6 +511,10 @@ export default {
               var i = this.temp_string.indexOf(']');
               this.temp_string = this.temp_string.substring(0, i);
               this.temp_string += new_string;
+
+              temp_amountSum += parseInt(this.user_amount);
+
+              console.log('Updated amountSum: ' + temp_amountSum);
 
               axios({
                   method: 'POST',
@@ -504,6 +526,7 @@ export default {
                   data: {
                     'doc': {
                       'pDetail': JSON.parse(this.temp_string),
+                      'pAmountSum': temp_amountSum,
                     }
                   }
                 })
