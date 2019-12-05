@@ -126,11 +126,7 @@ function getTimeStamp() {
   var s =
     leadingZeros(d.getFullYear(), 4) + '-' +
     leadingZeros(d.getMonth() + 1, 2) + '-' +
-    leadingZeros(d.getDate(), 2) + ' ' +
-
-    leadingZeros(d.getHours(), 2) + ':' +
-    leadingZeros(d.getMinutes(), 2) + ':' +
-    leadingZeros(d.getSeconds(), 2);
+    leadingZeros(d.getDate(), 2) + ' ';
 
   return s;
 }
@@ -150,6 +146,52 @@ function test(){
   alert("test");
 }
 
+async function fetchItem(temp_id,i,length) {
+ await axios({
+    method: 'POST',
+    url: baseurl + '/bakery_product/_search',
+    headers: {
+      Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+      'Content-Type': 'application/json'
+    },
+    data: {
+      'query': {
+        'match_phrase': {
+          '_id': temp_id
+        }
+      }
+    }
+  }).then((response) => {
+    var temp_sum = response.data.hits.hits[0]._source.pSaleSum;
+    console.log('before temp_sum: '+temp_sum);
+    temp_sum = (parseInt(temp_sum)+1);
+
+    axios({
+        method: 'POST',
+        url: baseurl + '/bakery_product/_doc/' + temp_id + '/_update',
+        headers: {
+          Authorization: 'Basic cnVjeHhkam0zOjdkNWZkM2I2LWYyMzctNGMzMS1hZDJiLTVhYjVmZjNiM2FlMg==',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          'doc': {
+            'pSaleSum': temp_sum,
+          }
+        }
+      })
+      .then((response) => {
+        console.log('pSaleSum updated: '+temp_sum);
+        if(i==length-1){
+          alert("거래가 완료되었습니다.");
+          window.history.go(0);
+        }
+      }).catch((e) => {
+        console.log(e.response)
+      })
+  }).catch((ex) => {
+    console.log("ERR!!!!! : ", ex)
+  })
+}
 
 export default {
   name: 'Payment',
@@ -186,7 +228,7 @@ export default {
       user_id: null,
       user_remain_coin: null,
 
-
+      bulk_amount: [],
     }
   },
 
@@ -223,15 +265,9 @@ export default {
         console.log(e.response)
       })
 
-    //var currentDate = new Date();
-
-    //var currentDateWithFormat = new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-    //this.buying_date = currentDateWithFormat;
     this.buying_date = getTimeStamp();
-
-    //alert(this.buying_date);
-
   },
+
   destroyed() {
     this.$barcodeScanner.destroy()
   },
@@ -373,7 +409,7 @@ export default {
       var html = '<table>';
       for (var i = 0; i < this.product_list.length; i++) {
         html += '<tr>';
-        html += '<td><button id="test-btn">' + this.product_list[i] + '</button></td>';
+        html += '<td>' + this.product_list[i] + '</td>';
         html += '<td>' + this.product_amount[i] + '</td>';
         html += '</tr>';
       }
@@ -382,9 +418,6 @@ export default {
       console.log(this.product_list);
 
       document.getElementById("lists").innerHTML = html;
-
-
-
     },
 
     reset() {
@@ -527,6 +560,12 @@ export default {
         var today = new Date();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
+        console.log('product_id length: '+this.product_id.length);
+        for(var i = 0; i < this.product_id.length; i++){
+          var temp_id = this.product_id[i];
+          fetchItem(temp_id,i,this.product_id.length);
+        }
+
         //axios POST 레코드 생성
         axios({
             method: 'POST',
@@ -547,9 +586,7 @@ export default {
             }
           })
           .then((response) => {
-            console.log(response);
-            alert("결제가 성공적으로 진행되었습니다");
-            window.history.go(0);
+            console.log("레코드 생성 완료");
 
           }).catch((e) => {
             console.log(e.response)
