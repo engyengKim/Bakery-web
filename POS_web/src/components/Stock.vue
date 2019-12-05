@@ -313,9 +313,10 @@ export default {
             console.log(response);
 
             var old_amount = null;
-            var temp_amountSum = 0;
 
             this.temp_length = response.data.docs[0]._source.pDetail.length;
+            var temp_amountSum = parseInt(response.data.docs[0]._source.pAmountSum);
+
             console.log(response.data.docs[0]._source.pDetail);
 
             for (var i = 0; i < this.temp_length; i++) {
@@ -328,10 +329,10 @@ export default {
                 old_amount = this.temp_arr_amount[i];
                 this.temp_arr_amount[i] = this.user_amount;
               }
-              temp_amountSum += parseInt(this.temp_arr_amount[i]);
             }
 
-            console.log('Before amountSum: ' + response.data.docs[0]._source.pAmountSum);
+            console.log('Before amountSum: ' + temp_amountSum);
+            temp_amountSum += (parseInt(this.user_amount) - parseInt(old_amount));
             console.log('Updated amountSum: ' + temp_amountSum);
 
             if (this.is_same && this.user_amount >= 0 && this.what_change == 1) {
