@@ -15,6 +15,7 @@ import Admin_myPage from '@/components/Admin_myPage'
 import Admin_manage from '@/components/Admin_manage'
 import Admin_Login from '@/components/Admin_Login'
 import Revenue_monthly from '@/components/Revenue_monthly'
+import Revenue_daily from '@/components/Revenue_daily'
 
 Vue.use(Router)
 
@@ -94,6 +95,11 @@ export default new Router({
       path: '/revenue_monthly',
       name: 'Revenue_monthly',
       component: Revenue_monthly
+    },
+    {
+      path: '/revenue_daily',
+      name: 'Revenue_daily',
+      component: Revenue_daily
     },
   ]
 })

@@ -27,6 +27,50 @@
 
       <h5 id="theme">매니저 현황</h5>
 
+      <div style="margin-left:auto; margin-right:auto;">
+        <md-dialog :md-active.sync="showDialog" style="height:800px;">
+          <!-- openDialogFunction 추가 !! -->
+          <md-dialog-title>새로운 매니저 정보 입력</md-dialog-title>
+
+          <md-tabs md-dynamic-height>
+            <md-tab md-label="매니저 정보">
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span style="font-weight: bold;">이름</span>
+                  <input type="text" v-model="m_name" class="form-control" placeholder="이름">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="input-group mb-3">
+                  <span style="font-weight: bold;">연락처</span>
+                  <input type="text" v-model="m_contact" class="form-control" placeholder="연락처">
+                  <span style="font-weight: bold;">이메일</span>
+                  <input type="text" v-model="m_email" class="form-control" placeholder="메일 주소">
+                </div>
+              </div>
+            </md-tab>
+
+            <md-tab md-label="가게 정보">
+              <div class="form-group">
+                <span style="font-weight: bold;">가게 이름</span>
+                <input type="text" v-model="m_storeName" class="form-control" placeholder="가게 이름">
+                <span style="font-weight: bold;">가게 주소</span>
+                <input type="text" v-model="m_address" class="form-control" placeholder="가게 주소">
+              </div>
+            </md-tab>
+
+          </md-tabs>
+
+          <md-dialog-actions>
+            <md-button class="md-primary" @click="showDialog = false">취소</md-button>
+            <md-button class="md-accent" @click="add_manager()">등록</md-button>
+          </md-dialog-actions>
+        </md-dialog>
+
+        <md-button class="md-primary" @click="showDialog = true" style="font-weight:bold;">매니저 등록</md-button>
+      </div>
+
       <div id="app">
         <reactive-base app="bakery_manager" credentials="WQ73FJ2Me:93ebb63e-a51c-42f5-8b8e-69c0c664b7d3">
 
@@ -195,6 +239,16 @@ export default {
   name: 'Stock',
   data() {
     return {
+      showDialog: false,
+
+      m_address: '',
+      m_bankinfo: '',
+      m_contact: '',
+      m_email: '',
+      m_name: '',
+      m_pwd: '123',
+      m_storeName: '',
+      m_type:'Manager',
 
     };
   },
@@ -359,6 +413,36 @@ export default {
             console.log(e.response)
           })
       }
+    },
+
+    add_manager(){
+      axios({
+          method: 'POST',
+          url: baseurl + '/bakery_manager/_doc/',
+          headers: {
+            Authorization: 'Basic eXVkeG5LSXFGOmM4NWFiNGE0LWQ0ZTktNDJjNC1iMDdkLTMzMTMwYTU1MzRhMw==',
+            'Content-Type': 'application/json'
+          },
+
+          data: {
+            "address": this.m_address,
+            "contact": this.m_contact,
+            "email": this.m_email,
+            "name": this.m_name,
+            "password": this.m_pwd,
+            "storeName": this.m_storeName,
+            "type": this.m_type
+          }
+        })
+        .then((response) => {
+          //var hits_length = response.data.hits.hits.length
+          console.log(response);
+          alert("매니저가 등록되었습니다.");
+          window.history.go(0);
+
+        }).catch((e) => {
+          console.log(e.response)
+        })
     },
   }
 }
