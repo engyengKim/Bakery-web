@@ -78,7 +78,7 @@
                 <md-tab md-label="베이커리 코인">
                   <div style="font-weight:bold;">가격: {{this.tot_price}}</div>
                   <span>사용자 바코드</span>
-                  <input type="user_barcode" id="user_barcode" value="" v-model="user_barcode" class="form-control" readonly>
+                  <input type="user_barcode" id="user_barcode" value="" v-model="user_barcode" class="form-control">
                   <md-button class="md-dense md-raised md-primary" @click="check_coin()">잔액 조회</md-button>
 
                   <div style="color:green">
@@ -116,36 +116,29 @@
 import axios from 'axios'
 const baseurl = 'https://scalr.api.appbase.io'
 var payWindow = false;
-
 function numberFormat(inputNumber) { // 정규식으로 숫자 천 단위로 콤마찍기
   return inputNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
 function getTimeStamp() {
   var d = new Date();
   var s =
     leadingZeros(d.getFullYear(), 4) + '-' +
     leadingZeros(d.getMonth() + 1, 2) + '-' +
     leadingZeros(d.getDate(), 2) + ' ';
-
   return s;
 }
-
 function leadingZeros(n, digits) {
   var zero = '';
   n = n.toString();
-
   if (n.length < digits) {
     for (var i = 0; i < digits - n.length; i++)
       zero += '0';
   }
   return zero + n;
 }
-
 function test(){
   alert("test");
 }
-
 async function fetchItem(temp_id,i,length) {
  await axios({
     method: 'POST',
@@ -165,7 +158,6 @@ async function fetchItem(temp_id,i,length) {
     var temp_sum = response.data.hits.hits[0]._source.pSaleSum;
     console.log('before temp_sum: '+temp_sum);
     temp_sum = (parseInt(temp_sum)+1);
-
     axios({
         method: 'POST',
         url: baseurl + '/bakery_product/_doc/' + temp_id + '/_update',
@@ -192,7 +184,6 @@ async function fetchItem(temp_id,i,length) {
     console.log("ERR!!!!! : ", ex)
   })
 }
-
 export default {
   name: 'Payment',
   data() {
@@ -203,7 +194,6 @@ export default {
       product_price: [],
       product_id: [],
       product_img: [],
-
       now_product_name: '',
       is_clicked: false,
       active: false,
@@ -215,11 +205,9 @@ export default {
       gift_number: null,
       is_remain: false,
       is_partial_pay: false,
-
       buying_date: null,
       buying_store: null,
       buying_manager: null,
-
       user_barcode: null,
       user_money: null,
       user_amount: null,
@@ -227,13 +215,10 @@ export default {
       user_bakeryCoin: null,
       user_id: null,
       user_remain_coin: null,
-
       bulk_amount: [],
     }
   },
-
   created() {
-
     console.log("type:" + this.$session.type)
     if (this.$session.get('type') != 'Manager') {
       alert("매니저 계정으로 로그인 해주세요")
@@ -241,7 +226,6 @@ export default {
     }
     this.$barcodeScanner.init(this.onBarcodeScanned)
     this.uid = this.$session.get('uId');
-
     // axios POST
     axios({
         method: 'POST',
@@ -258,16 +242,13 @@ export default {
       })
       .then((response) => {
         console.log(response);
-
         this.buying_manager = response.data.docs[0]._source.name;
         this.buying_store = response.data.docs[0]._source.address;
       }).catch((e) => {
         console.log(e.response)
       })
-
     this.buying_date = getTimeStamp();
   },
-
   destroyed() {
     this.$barcodeScanner.destroy()
   },
@@ -278,21 +259,17 @@ export default {
     openDialogFunction() {
       payWindow = true;
       this.tot_price = this.sum
-
     },
     closeDialogFunction() {
       payWindow = false;
-
     },
     check_coin() {
       if (this.user_barcode == null) {
         //test용 테스트시 alert 부분 주석처리하고 이거 사용할것
-        this.user_barcode = "8800000000015"
-        //alert("바코드를 입력해주세요.")
+        //this.user_barcode = "8800000000015"
+        alert("바코드를 입력해주세요.")
       }
-
       if (payWindow == true && this.user_barcode != null) {
-
         axios({
           method: 'POST',
           url: baseurl + '/bakery_customer/_search',
@@ -309,14 +286,11 @@ export default {
           }
         }).then((response) => {
           console.log(response);
-
           if (response.data.hits.hits.legnth != 0) {
-
             var data = response.data.hits.hits[0]._source
             var coin = data.bakeryCoin
             this.user_name = data.name
             this.user_id = response.data.hits.hits[0]._id
-
             if (this.tot_price <= coin) {
               this.user_remain_coin = coin * 1 - this.tot_price * 1
               alert("결제 가능합니다.\n현재 Bakery Coin 잔액 : " + numberFormat(coin) + "원\n결제 후 Bakery Coin 잔액 : " + numberFormat(this.user_remain_coin) + "원")
@@ -329,7 +303,6 @@ export default {
           } else {
             alert("회원 정보에 해당 바코드가 존재하지 않습니다.\n회원이 아니시거나 바코드가 잘못되었습니다.")
           }
-
         }).catch((ex) => {
           console.log("ERR!!!!! : ", ex)
         })
@@ -350,7 +323,6 @@ export default {
         document.getElementById("user_barcode").value = barcode // 바코드란 값 변경해주기
         this.user_barcode = barcode;
       } else { //결제창 아닐때 바코드 작동
-
         axios({
           method: 'GET',
           url: baseurl + '/bakery_product/_search?q=*' + barcode + '*',
@@ -365,7 +337,6 @@ export default {
           pName = response.data.hits.hits[0]._source.pName
           pPrice = response.data.hits.hits[0]._source.pPrice
           pImg = response.data.hits.hits[0]._source.pImg
-
           if (this.product_list.includes(pName)) {
             alert("이미 목록에 존재하는 상품입니다.")
           } else {
@@ -374,18 +345,15 @@ export default {
             this.product_img.push(pImg)
             this.sum += parseInt(pPrice)
           }
-
           var html = '<table>';
           for (var i = 0; i < this.product_list.length; i++) {
             html += '<tr>';
             html += '<td>' + this.product_list[i] + '</td>';
             html += '<td>' + this.product_amount[i] + '</td>';
             html += '</tr>';
-
           }
           html += '</table>';
           document.getElementById("lists").innerHTML = html;
-
         }).catch((ex) => {
           alert("바코드에 해당되는 상품이 없습니다!")
           console.log("ERR!!!!! : ", ex)
@@ -394,7 +362,6 @@ export default {
     },
     get_name(name, price, id, image) {
       this.product_name = name
-
       if (this.product_list.includes(name)) {
         alert("이미 품목에 추가되었습니다")
       } else {
@@ -402,10 +369,8 @@ export default {
         this.product_amount.push(1)
         this.product_id.push(id)
         this.product_img.push(image)
-
         this.sum += parseInt(price)
       }
-
       var html = '<table>';
       for (var i = 0; i < this.product_list.length; i++) {
         html += '<tr>';
@@ -414,12 +379,9 @@ export default {
         html += '</tr>';
       }
       html += '</table>';
-
       console.log(this.product_list);
-
       document.getElementById("lists").innerHTML = html;
     },
-
     reset() {
       this.product_list = []
       this.product_amount = []
@@ -429,20 +391,15 @@ export default {
       this.tot_price = 0
       document.getElementById("lists").innerHTML = this.product_list
     },
-
     delete_product(name, price) {
       var a = this.product_list.indexOf(name);
       if (a != -1) {
         var temp = (this.product_amount[a]) * parseInt(price);
-
-
         this.product_list.splice(a, 1);
         this.product_amount.splice(a, 1);
         this.product_id.splice(a, 1);
         this.product_img.splice(a, 1);
-
         this.sum -= temp;
-
         var html = '<table>';
         for (var i = 0; i < this.product_list.length; i++) {
           html += '<tr>';
@@ -450,18 +407,14 @@ export default {
           html += '<td>' + this.product_amount[i] + '</td>';
           html += '</tr>';
         }
-
         html += '</table>';
         document.getElementById("lists").innerHTML = html;
       }
     },
-
     change_amount(name, price) {
-
       var a = this.product_list.indexOf(name);
       if (a != -1) {
         if (this.user_amount > 0) {
-
           if (this.user_amount > this.product_amount[a]) {
             // add (input-original)
             this.sum += (this.user_amount - this.product_amount[a]) * parseInt(price);
@@ -469,21 +422,17 @@ export default {
             // gap
             this.sum -= (this.product_amount[a] - this.user_amount) * parseInt(price);
           }
-
           this.product_amount[a] = this.user_amount;
           this.user_amount = null;
-
           var html = '<table>';
           for (var i = 0; i < this.product_list.length; i++) {
             html += '<tr>';
             html += '<td>' + this.product_list[i] + '</td>';
             html += '<td>' + this.product_amount[i] + '</td>';
             html += '</tr>';
-
           }
           html += '</table>';
           document.getElementById("lists").innerHTML = html;
-
           this.is_clicked = false;
         } else {
           alert("숫자를 입력하세요!");
@@ -492,13 +441,10 @@ export default {
         alert("메뉴를 먼저 선택하세요!");
       }
     },
-
     pay() {
-
       if (this.ok_pressed) {
         this.remain = null;
         this.showDialog = false;
-
         if (this.user_money == null) {
           // only user BakeryCoin
           this.user_money = 0;
@@ -508,11 +454,9 @@ export default {
           this.user_bakeryCoin = 0;
           this.user_name = '익명';
         }
-
         // set rDetail: rAmount, rName, rImg
         var user_detail = '[';
         var length = this.product_list.length;
-
         for (var i = 0; i < length; i++) {
           user_detail += '{ "rAmount" : "';
           user_detail += this.product_amount[i];
@@ -526,14 +470,12 @@ export default {
             user_detail += '" }]';
           }
         }
-
         // set rType: cash, coin
         var user_type = '{ "cash" : "';
         user_type += this.user_money;
         user_type += '", "coin" : "';
         user_type += this.user_bakeryCoin;
         user_type += '" }';
-
         if (this.user_barcode != null && this.bakeryCoin != 0) {
           axios({
               method: 'POST',
@@ -556,16 +498,13 @@ export default {
               console.log(e.response)
             })
         }
-
         var today = new Date();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-
         console.log('product_id length: '+this.product_id.length);
         for(var i = 0; i < this.product_id.length; i++){
           var temp_id = this.product_id[i];
           fetchItem(temp_id,i,this.product_id.length);
         }
-
         //axios POST 레코드 생성
         axios({
             method: 'POST',
@@ -587,41 +526,31 @@ export default {
           })
           .then((response) => {
             console.log("레코드 생성 완료");
-
           }).catch((e) => {
             console.log(e.response)
           })
-
       } else {
         alert("에러: 승인 거부");
       }
-
     },
-
     onCancel() {},
-
     edit_clicked(name) {
       var a = this.product_list.indexOf(name);
-
       if (a != -1) {
         this.now_product_name = name;
         this.is_clicked = true;
       } else {
         alert("메뉴를 먼저 선택하세요!");
       }
-
     },
-
     get_now_name() {
       return (this.now_product_name);
     },
-
     got_money() {
       // when using CASH
       this.remain = null;
       if (this.user_money != null) {
         if (this.user_money < this.sum) {
-
           alert("잔금 " + (this.sum - this.user_money) + "원은 베이커리 코인으로 결제하세요.");
           this.tot_price = this.sum - this.user_money;
           this.is_remain = true;
@@ -636,10 +565,8 @@ export default {
         alert("에러: 받은 현금이 없습니다!");
       }
     },
-
     close_pay() {
       this.showDialog = false;
-
       // this.remain = null;
       // this.user_money = null;
       // this.card_number = null;
@@ -652,9 +579,7 @@ export default {
       // this.product_id = [];
       //
       // document.getElementById("lists").innerHTML = this.product_list;
-
     },
-
   }
 }
 </script>
@@ -666,7 +591,6 @@ export default {
 @import 'vue-material/dist/theme/default.css';
 @import url('https://fonts.googleapis.com/css?family=Arbutus+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap');
-
 .container {
   padding-left: 0px;
   padding-right: 0px;
@@ -675,36 +599,28 @@ export default {
   width: auto;
   font-family: 'Noto Sans KR', sans-serif;
 }
-
 #nav_home {
   color: white;
 }
-
 .text-field {
   margin-left: 40px;
   margin-top: 40px;
 }
-
 .item1 {
   grid-area: product_list;
   overflow-y: scroll;
 }
-
 .item3 {
   grid-area: tot_price;
   margin-bottom: 20px;
 }
-
 .item4 {
   grid-area: is_pay;
   margin-bottom: 20px;
 }
-
 .item2 {
   grid-area: set;
 }
-
-
 .grid-container {
   display: grid;
   grid-template-areas:
@@ -712,13 +628,11 @@ export default {
     'tot_price is_pay';
   grid-gap: 30px;
 }
-
 .grid-container>div {
   background-color: #DFF0F1;
   border: 1px solid #C8CDEE;
   text-align: center;
 }
-
 .item5 {
   scroll-behavior: smooth;
   justify-content: center;
@@ -728,7 +642,6 @@ export default {
   padding: 0px;
   margin: 0px;
 }
-
 .item6 {
   overflow-y: hidden;
   overflow-x: hidden;
@@ -736,17 +649,14 @@ export default {
   transition: all ease 0.2s;
   display: inline-grid;
 }
-
 #input_amount {
   width: 60px;
 }
-
 .price_result {
   color: red;
   font-weight: bold;
   font-size: 30px;
 }
-
 .filter.css-m1gst5 {
   width: 120px;
   padding: 0px;

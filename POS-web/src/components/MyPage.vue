@@ -38,7 +38,6 @@
             </span>
 
         </span><br>
-        <div style="margin-top:10px;">매니저 계좌번호: <span class="user_info">{{ this.user_bankinfo }}</span></div>
         <div class="crack" />
 
         <h6 style="margin-top: 30px; margin-bottom:10px;">[가게 정보]</h6>
