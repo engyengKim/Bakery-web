@@ -36,6 +36,11 @@
                       </tbody>
                     </table>
 
+                    <div>
+                      <span style="font-weight:bold; margin-left:10px;">요구사항</span>
+                      {{item.aoRequestContent}}
+                    </div>
+
                     <div style="margin-bottom:10px;">
                       <md-button class="md-dense" style="color:green; font-weight:bold;" v-on:click="detail_clicked(item._id)">제품 목록 확인</md-button>
                       <table id="aoDetail" style="width:300px; background-color:#E6E5D9; border-radius: 10px;" v-if="(get_now_id() == item._id)"></table>
